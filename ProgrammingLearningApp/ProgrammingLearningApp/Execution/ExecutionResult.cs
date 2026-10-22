@@ -2,6 +2,8 @@ using ProgrammingLearningApp.Domain;
 
 namespace ProgrammingLearningApp.Execution;
 
+//what you get after running a program: the trace of all commands that were done
+//and the end state of the character
 public sealed class ExecutionResult
 {
     private readonly List<string> _trace;

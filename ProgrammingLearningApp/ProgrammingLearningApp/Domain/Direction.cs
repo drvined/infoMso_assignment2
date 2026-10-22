@@ -8,6 +8,7 @@ public enum Direction
     West
 }
 
+//turning works by stepping through the enum % 4 makes it wrap around
 public static class DirectionExtensions
 {
     public static Direction TurnRight(this Direction direction) =>

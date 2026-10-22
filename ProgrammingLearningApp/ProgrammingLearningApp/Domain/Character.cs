@@ -1,14 +1,18 @@
 ﻿namespace ProgrammingLearningApp.Domain;
+
+//the figure that walks over the grid keep track of where it is and which way it faces
 public sealed class Character
 {
     public int X { get; private set; }
     public int Y { get; private set; }
     public Direction Direction { get; private set; }
 
+    //new character starts at (0,0) facing east like in the assignment
     public Character() : this(0, 0, Direction.East)
     {
     }
 
+    //start somewhere else handy for tests
     public Character(int x, int y, Direction direction)
     {
         X = x;
@@ -16,10 +20,13 @@ public sealed class Character
         Direction = direction;
     }
 
+    //only the direction changes position stays the same
     public void TurnLeft() => Direction = Direction.TurnLeft();
 
     public void TurnRight() => Direction = Direction.TurnRight();
 
+    //movs one cell in the direction its facing
+    //y goes down when going north and up when going south
     public void StepForward()
     {
         switch (Direction)
