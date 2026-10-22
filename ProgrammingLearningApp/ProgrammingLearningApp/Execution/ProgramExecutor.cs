@@ -3,14 +3,11 @@ using ProgrammingLearningApp.Domain;
 namespace ProgrammingLearningApp.Execution;
 
 
-//runs a GridProgram on a Character and records every executed Move and Turn.
 
 public sealed class ProgramExecutor
 {
-    //runs program on a new character that starts at (0,0) facing east
     public ExecutionResult Execute(GridProgram program) => Execute(program, new Character());
 
-    //runs program on the given character (its state is changed)
     public ExecutionResult Execute(GridProgram program, Character character)
     {
         ArgumentNullException.ThrowIfNull(program);
