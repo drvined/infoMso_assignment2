@@ -1,10 +1,13 @@
 ﻿namespace ProgrammingLearningApp.Domain;
+
+//the repeat command: runs its list of commands a number of times
 public sealed class Repeat : Command
 {
     private readonly List<Command> _commands;
 
     public int Times { get; }
 
+    //rd only, the commands inside cant be changed from outside
     public IReadOnlyList<Command> Commands => _commands;
 
     public Repeat(int times, IEnumerable<Command> commands)
