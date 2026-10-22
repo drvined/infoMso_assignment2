@@ -24,8 +24,8 @@ public sealed class Character
     {
         switch (Direction)
         {
-            case Direction.North: Y++; break;
-            case Direction.South: Y--; break;
+            case Direction.North: Y--; break;
+            case Direction.South: Y++; break;
             case Direction.East: X++; break;
             case Direction.West: X--; break;
         }
