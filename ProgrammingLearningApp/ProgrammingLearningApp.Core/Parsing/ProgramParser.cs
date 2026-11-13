@@ -7,10 +7,9 @@ public sealed class ProgramParser
 {
     private const int IndentSize = 4;
 
-    //one non empty line of the source, with its indentation level
     private sealed record SourceLine(int Number, int Level, string Content);
 
-    //reads and parses a program file. The program name is the file name without extension
+    //reads and parses program file
     public GridProgram ParseFile(string path)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
@@ -24,7 +23,7 @@ public sealed class ProgramParser
         return Parse(name, File.ReadAllText(path));
     }
 
-    //parses program text into a program with the given name
+    //parses program text into program with the given name
     public GridProgram Parse(string name, string text)
     {
         ArgumentNullException.ThrowIfNull(name);
@@ -44,7 +43,7 @@ public sealed class ProgramParser
     private static List<SourceLine> ReadLines(string text)
     {
         var result = new List<SourceLine>();
-        var rawLines = text.Split('\n');
+        var rawLines = TextLines.Split(text);
 
         for (var i = 0; i < rawLines.Length; i++)
         {
@@ -82,8 +81,7 @@ public sealed class ProgramParser
     }
 
 
-    //parses consecutive lines at exactly level, it stops
-    //first line that is indented less 
+    //parses consecutive lines at exactly level
     private static List<Command> ParseBlock(List<SourceLine> lines, ref int index, int level)
     {
         var commands = new List<Command>();
@@ -130,39 +128,38 @@ public sealed class ProgramParser
             case "Turn":
                 throw Error(line, "Expected 'Turn left' or 'Turn right'.");
 
-            case "Repeat" when parts.Length == 3 && parts[2] == "times":
-                var times = ParseCount(line, parts[1]);
+            case "Repeat" when parts.Length == 2 || (parts.Length == 3 && parts[2] == "times"):
+                return new Repeat(ParseCount(line, parts[1]), ParseBody(line, lines, ref index));
 
-                if (index >= lines.Count || lines[index].Level <= line.Level)
-                {
-                    throw Error(line,
-                        $"A repeat needs at least one command below it, indented {IndentSize} more spaces.");
-                }
-
-                var body = ParseBlock(lines, ref index, line.Level + 1);
-                return new Repeat(times, body);
+            case "RepeatUntil" when parts.Length == 2:
+                return new RepeatUntil(ParseCondition(line, parts[1]), ParseBody(line, lines, ref index));
 
             case "Repeat" when parts.Length == 3 && parts[1] == "until":
-                var condition = ParseCondition(line, parts[2]);
-
-                if (index >= lines.Count || lines[index].Level <= line.Level)
-                {
-                    throw Error(line,
-                        $"A repeat until needs at least one command below it, indented {IndentSize} more spaces.");
-                }
-
-                var untilBody = ParseBlock(lines, ref index, line.Level + 1);
-                return new RepeatUntil(condition, untilBody);
+                return new RepeatUntil(ParseCondition(line, parts[2]), ParseBody(line, lines, ref index));
 
             case "Repeat":
-                throw Error(line, "Expected 'Repeat [x] times' or 'Repeat until [condition]'.");
+                throw Error(line, "Expected 'Repeat [x]', for example 'Repeat 4'.");
+
+            case "RepeatUntil":
+                throw Error(line, "Expected 'RepeatUntil [condition]', for example 'RepeatUntil WallAhead'.");
 
             default:
-                throw Error(line, $"Unknown command '{parts[0]}'. Valid commands are Move, Turn and Repeat.");
+                throw Error(line,
+                    $"Unknown command '{parts[0]}'. Valid commands are Move, Turn, Repeat and RepeatUntil.");
         }
     }
 
-    //parses a whole number of zero or more
+    private static List<Command> ParseBody(SourceLine line, List<SourceLine> lines, ref int index)
+    {
+        if (index >= lines.Count || lines[index].Level <= line.Level)
+        {
+            throw Error(line, $"A repeat needs at least one command below it, indented {IndentSize} more spaces.");
+        }
+
+        return ParseBlock(lines, ref index, line.Level + 1);
+    }
+
+    //parses a whole number
     private static int ParseCount(SourceLine line, string text)
     {
         if (!int.TryParse(text, NumberStyles.None, CultureInfo.InvariantCulture, out var value))
@@ -173,7 +170,7 @@ public sealed class ProgramParser
         return value;
     }
 
-    //reads the name of a condition, for example WallAhead or GridEdge
+    //read name of a condition
     private static Condition ParseCondition(SourceLine line, string text) => text switch
     {
         "WallAhead" => new WallAheadCondition(),

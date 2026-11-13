@@ -4,91 +4,179 @@ using DomainGrid = ProgrammingLearningApp.Domain.Grid;
 
 namespace ProgrammingLearningApp.Maui;
 
-//draws the grid, the path the character walked over it and the character on its last cell
+//draws the grid, the path and the character on its last cell
+//without grid only the path is drawn
 public sealed class GridDrawable : IDrawable
 {
+    //maxz size cell without grid
+    private const float MaxFreeCellSize = 40;
+
+    private static readonly Color EmptyColor = Color.FromArgb("#2A2A30");
+    private static readonly Color WallColor = Color.FromArgb("#5A5A66");
+    private static readonly Color ExitColor = Color.FromArgb("#3DDC84");
+    private static readonly Color StartColor = Color.FromArgb("#FFC857");
+    private static readonly Color LineColor = Color.FromArgb("#3A3A42");
+    private static readonly Color PathColor = Color.FromArgb("#7C5CFF");
+    private static readonly Color CharacterColor = Color.FromArgb("#FF6FB5");
+    private static readonly Color HintColor = Color.FromArgb("#8B8B96");
+
     private DomainGrid? _grid;
     private IReadOnlyList<Position> _path = [];
+    private Direction? _facing;
 
-    public void Update(DomainGrid grid, IReadOnlyList<Position> path)
+    public void Update(DomainGrid? grid, IReadOnlyList<Position> path, Direction? facing)
     {
         _grid = grid;
         _path = path;
+        _facing = facing;
     }
+
+    public void Clear() => Update(null, [], null);
 
     public void Draw(ICanvas canvas, RectF dirtyRect)
     {
-        if (_grid is null)
+        if (_grid is null && _path.Count == 0)
         {
+            DrawHint(canvas, dirtyRect);
             return;
         }
 
-        var cellSize = Math.Min(dirtyRect.Width / _grid.Width, dirtyRect.Height / _grid.Height);
-        var offsetX = dirtyRect.Left;
-        var offsetY = dirtyRect.Top;
+        var area = VisibleArea();
+        var cellSize = Math.Min(dirtyRect.Width / area.Width, dirtyRect.Height / area.Height);
+        if (_grid is null)
+        {
+            cellSize = Math.Min(cellSize, MaxFreeCellSize);
+        }
 
-        DrawCells(canvas, cellSize, offsetX, offsetY);
-        DrawPath(canvas, cellSize, offsetX, offsetY);
-        DrawCharacter(canvas, cellSize, offsetX, offsetY);
+        var view = new CellLayout(
+            cellSize,
+            dirtyRect.Left + (dirtyRect.Width - cellSize * area.Width) / 2 - area.Left * cellSize,
+            dirtyRect.Top + (dirtyRect.Height - cellSize * area.Height) / 2 - area.Top * cellSize);
+
+        DrawCells(canvas, area, view);
+        DrawPath(canvas, view);
+        DrawCharacter(canvas, view);
     }
 
-    private void DrawCells(ICanvas canvas, float cellSize, float offsetX, float offsetY)
+    //the cells that have to fit in the view
+    private Area VisibleArea()
     {
-        for (var y = 0; y < _grid!.Height; y++)
+        if (_grid is not null)
         {
-            for (var x = 0; x < _grid.Width; x++)
-            {
-                var left = offsetX + x * cellSize;
-                var top = offsetY + y * cellSize;
+            return new Area(0, 0, _grid.Width, _grid.Height);
+        }
 
-                canvas.FillColor = ColorFor(_grid.GetCell(new Position(x, y)));
-                canvas.FillRectangle(left, top, cellSize, cellSize);
-                canvas.StrokeColor = Colors.Gray;
-                canvas.StrokeSize = 1;
-                canvas.DrawRectangle(left, top, cellSize, cellSize);
+        var minX = _path.Min(p => p.X);
+        var minY = _path.Min(p => p.Y);
+        var maxX = _path.Max(p => p.X);
+        var maxY = _path.Max(p => p.Y);
+        return new Area(minX, minY, maxX - minX + 1, maxY - minY + 1);
+    }
+
+    private void DrawCells(ICanvas canvas, Area area, CellLayout view)
+    {
+        canvas.StrokeColor = LineColor;
+        canvas.StrokeSize = 1;
+
+        for (var y = area.Top; y < area.Top + area.Height; y++)
+        {
+            for (var x = area.Left; x < area.Left + area.Width; x++)
+            {
+                var position = new Position(x, y);
+                var left = view.OffsetX + x * view.CellSize;
+                var top = view.OffsetY + y * view.CellSize;
+
+                canvas.FillColor = _grid is null ? EmptyColor : ColorFor(_grid.GetCell(position));
+                canvas.FillRectangle(left, top, view.CellSize, view.CellSize);
+                canvas.DrawRectangle(left, top, view.CellSize, view.CellSize);
             }
+        }
+
+        if (_grid is null)
+        {
+            var start = view.Center(_path[0]);
+            canvas.FillColor = StartColor;
+            canvas.FillCircle(start.X, start.Y, view.CellSize * 0.15f);
         }
     }
 
-    private void DrawPath(ICanvas canvas, float cellSize, float offsetX, float offsetY)
+    private void DrawPath(ICanvas canvas, CellLayout view)
     {
         if (_path.Count < 2)
         {
             return;
         }
 
-        canvas.StrokeColor = Colors.Blue;
-        canvas.StrokeSize = 3;
+        canvas.StrokeColor = PathColor;
+        canvas.StrokeSize = Math.Max(2, view.CellSize / 6);
+        canvas.StrokeLineCap = LineCap.Round;
 
         for (var i = 1; i < _path.Count; i++)
         {
-            var from = Center(_path[i - 1], cellSize, offsetX, offsetY);
-            var to = Center(_path[i], cellSize, offsetX, offsetY);
+            var from = view.Center(_path[i - 1]);
+            var to = view.Center(_path[i]);
             canvas.DrawLine(from.X, from.Y, to.X, to.Y);
         }
     }
 
-    //a red dot on the cell where the character ends, or where it stopped when an error happened
-    private void DrawCharacter(ICanvas canvas, float cellSize, float offsetX, float offsetY)
+    //the character on the cell where it ends the triangle pointing the way it faces
+    private void DrawCharacter(ICanvas canvas, CellLayout view)
     {
         if (_path.Count == 0)
         {
             return;
         }
 
-        var position = Center(_path[^1], cellSize, offsetX, offsetY);
-        canvas.FillColor = Colors.Red;
-        canvas.FillCircle(position.X, position.Y, cellSize * 0.3f);
+        var center = view.Center(_path[^1]);
+        var size = view.CellSize * 0.35f;
+        canvas.FillColor = CharacterColor;
+
+        if (_facing is not { } facing)
+        {
+            canvas.FillCircle(center.X, center.Y, size);
+            return;
+        }
+
+        var (dx, dy) = facing switch
+        {
+            Direction.North => (0f, -1f),
+            Direction.East => (1f, 0f),
+            Direction.South => (0f, 1f),
+            _ => (-1f, 0f)
+        };
+
+        var triangle = new PathF();
+        triangle.MoveTo(center.X + dx * size, center.Y + dy * size);
+        triangle.LineTo(center.X - dx * size * 0.7f - dy * size * 0.8f, center.Y - dy * size * 0.7f + dx * size * 0.8f);
+        triangle.LineTo(center.X - dx * size * 0.7f + dy * size * 0.8f, center.Y - dy * size * 0.7f - dx * size * 0.8f);
+        triangle.Close();
+        canvas.FillPath(triangle);
     }
 
-    private static PointF Center(Position position, float cellSize, float offsetX, float offsetY) =>
-        new(offsetX + (position.X + 0.5f) * cellSize, offsetY + (position.Y + 0.5f) * cellSize);
+    private static void DrawHint(ICanvas canvas, RectF dirtyRect)
+    {
+        canvas.FontColor = HintColor;
+        canvas.FontSize = 14;
+        canvas.DrawString("Voer een programma uit of laad een oefening.", dirtyRect,
+            Microsoft.Maui.Graphics.HorizontalAlignment.Center,
+            Microsoft.Maui.Graphics.VerticalAlignment.Center);
+    }
 
     private static Color ColorFor(CellType type) => type switch
     {
-        CellType.Blocked => Colors.DarkGray,
-        CellType.Exit => Colors.LightGreen,
-        CellType.Start => Colors.Yellow,
-        _ => Colors.White
+        CellType.Blocked => WallColor,
+        CellType.Exit => ExitColor,
+        CellType.Start => StartColor,
+        _ => EmptyColor
     };
+
+    //block of cells ( in cell coords)
+    private readonly record struct Area(int Left, int Top, int Width, int Height);
+
+    //where the drawing is on the screen
+    private readonly record struct CellLayout(float CellSize, float OffsetX, float OffsetY)
+    {
+        public PointF Center(Position position) =>
+            new(OffsetX + (position.X + 0.5f) * CellSize, OffsetY + (position.Y + 0.5f) * CellSize);
+    }
 }

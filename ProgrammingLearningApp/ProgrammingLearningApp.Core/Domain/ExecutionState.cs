@@ -1,8 +1,7 @@
 namespace ProgrammingLearningApp.Domain;
 
-//everything a command needs while a program runs: the character, the trace of
-//executed commands, the path (every cell the character has been on) and optionally the grid
-//(not called ExecutionContext because that name already exists in System.Threading)
+//everything command needs while a program runs
+// character, trace of executed commands, path  and optionally the grid
 public sealed class ExecutionState
 {
     public const int DefaultMaxSteps = 10_000;
@@ -15,20 +14,16 @@ public sealed class ExecutionState
 
     public Character Character { get; }
 
-    //null when the program runs without a grid
     public Grid? Grid => _grid;
 
     public IReadOnlyList<string> Trace => _trace;
 
-    //starts with the start cell, then one entry per step
     public IReadOnlyList<Position> Path => _path;
 
-    //without a grid there are no wall or edge checks
     public ExecutionState(Character character) : this(character, null)
     {
     }
 
-    //maxSteps stops the program when it runs too long, probably an endless loop
     public ExecutionState(Character character, Grid? grid, int maxSteps = DefaultMaxSteps)
     {
         ArgumentNullException.ThrowIfNull(character);
@@ -39,8 +34,7 @@ public sealed class ExecutionState
         _path.Add(character.Position);
     }
 
-    //counts one unit of work; every command that can loop calls this,
-    //so an endless loop is stopped even when it never moves the character
+    //counts one unit of work
     public void CountStep()
     {
         _stepCount++;
@@ -51,8 +45,7 @@ public sealed class ExecutionState
         }
     }
 
-    //moves the character one cell and remembers it in the path
-    //every step goes through here, so the step limit and the grid checks happen here
+    //moves the character one cel
     public void StepForward()
     {
         CountStep();

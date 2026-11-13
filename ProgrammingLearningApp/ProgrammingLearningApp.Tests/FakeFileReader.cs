@@ -2,7 +2,6 @@ using ProgrammingLearningApp.Exercises;
 
 namespace ProgrammingLearningApp.Tests;
 
-//a fake file reader: the files live in a dictionary, so the tests do not touch the disk
 public sealed class FakeFileReader : IFileReader
 {
     private readonly Dictionary<string, string> _files;

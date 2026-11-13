@@ -5,7 +5,6 @@ namespace ProgrammingLearningApp.Tests;
 
 public class ExecutionStateTests
 {
-    //3 wide and 2 high, only the cell at (1,0) is blocked
     private static Grid CreateGrid()
     {
         var cells = new CellType[3, 2];

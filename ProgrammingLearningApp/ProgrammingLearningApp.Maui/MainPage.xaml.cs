@@ -10,8 +10,14 @@ using DomainGrid = ProgrammingLearningApp.Domain.Grid;
 
 namespace ProgrammingLearningApp.Maui;
 
+//the main screen only reads input calls the Core classes and shows their results. THe logic lives in Core
 public partial class MainPage : ContentPage
 {
+    private static readonly Color NeutralColor = Color.FromArgb("#ECECF1");
+    private static readonly Color SuccessColor = Color.FromArgb("#3DDC84");
+    private static readonly Color FailureColor = Color.FromArgb("#FFB347");
+    private static readonly Color ErrorColor = Color.FromArgb("#FF6B6B");
+
     private readonly ProgramParser _programParser = new();
     private readonly GridParser _gridParser = new();
     private readonly ProgramExecutor _executor = new();
@@ -22,8 +28,7 @@ public partial class MainPage : ContentPage
     private readonly ExerciseChecker _exerciseChecker = new();
     private readonly GridDrawable _drawable = new();
     private readonly List<IProgramExporter> _exporters = [new ProgramWriter(), new JsonProgramExporter()];
-    private IReadOnlyList<GridProgram> _examplePrograms = [];
-    private PathfindingExercise? _currentExercise;
+    private readonly IReadOnlyList<GridProgram> _examplePrograms;
 
     public MainPage()
     {
@@ -36,7 +41,30 @@ public partial class MainPage : ContentPage
         ExportFormatPicker.ItemsSource = _exporters.Select(e => e.FormatName).ToList();
     }
 
-    //opens a .txt program file, checks it and puts the text in the program editor
+    private void OnRunClicked(object? sender, EventArgs e)
+    {
+        if (TryParseProgram("programma", out var program))
+        {
+            RunProgram(program);
+        }
+    }
+
+    //shows metrics of the program in the editor in the output field
+    private void OnMetricsClicked(object? sender, EventArgs e)
+    {
+        if (!TryParseProgram("programma", out var program))
+        {
+            return;
+        }
+
+        var metrics = _metrics.Calculate(program);
+        OutputEditor.Text = $"Aantal commando's: {metrics.CommandCount}{Environment.NewLine}" +
+                            $"Maximale nesting: {metrics.MaxNestingLevel}{Environment.NewLine}" +
+                            $"Aantal herhalingen: {metrics.RepeatCount}";
+        ShowStatus("Metrics berekend.", NeutralColor);
+    }
+
+    //opens a txt program file
     private async void OnImportClicked(object? sender, EventArgs e)
     {
         var file = await FilePicker.Default.PickAsync(new PickOptions
@@ -51,7 +79,7 @@ public partial class MainPage : ContentPage
 
         if (!file.FileName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase))
         {
-            ResultLabel.Text = "Kies een .txt bestand.";
+            ShowStatus("Kies een .txt bestand.", ErrorColor);
             return;
         }
 
@@ -61,90 +89,77 @@ public partial class MainPage : ContentPage
             using var reader = new StreamReader(stream);
             var text = await reader.ReadToEndAsync();
 
-            //checks the file now, so a mistake shows up at import and not only when the program runs
             var name = Path.GetFileNameWithoutExtension(file.FileName);
             var program = _programParser.Parse(name, text);
 
             ProgramEditor.Text = text;
-            ResultLabel.Text = $"Programma '{program.Name}' is geimporteerd.";
+            ShowStatus($"Programma '{program.Name}' is geïmporteerd.", NeutralColor);
         }
         catch (FormatException ex)
         {
-            ResultLabel.Text = ex.Message;
+            ShowStatus($"Dit bestand is geen geldig programma. {ex.Message}", ErrorColor);
+        }
+        catch (IOException ex)
+        {
+            ShowStatus(ex.Message, ErrorColor);
         }
     }
 
-    //saves the program in the editor in the chosen format to the Documents folder
+    //saves program in the editor in the chosen format to the documents folder
     private void OnExportClicked(object? sender, EventArgs e)
     {
         if (ExportFormatPicker.SelectedIndex < 0)
         {
-            ResultLabel.Text = "Kies eerst een exportformaat.";
+            ShowStatus("Kies eerst een exportformaat.", ErrorColor);
+            return;
+        }
+
+        if (!TryParseProgram("programma", out var program))
+        {
             return;
         }
 
         try
         {
-            var program = _programParser.Parse("programma", ProgramEditor.Text ?? string.Empty);
             var exporter = _exporters[ExportFormatPicker.SelectedIndex];
-
             var folder = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             var path = Path.Combine(folder, program.Name + exporter.FileExtension);
 
             File.WriteAllText(path, exporter.Export(program));
-            ResultLabel.Text = $"Geexporteerd naar: {path}";
-        }
-        catch (FormatException ex)
-        {
-            ResultLabel.Text = ex.Message;
+            ShowStatus($"Geëxporteerd naar: {path}", NeutralColor);
         }
         catch (IOException ex)
         {
-            ResultLabel.Text = ex.Message;
+            ShowStatus(ex.Message, ErrorColor);
         }
     }
 
-    private void OnRunClicked(object? sender, EventArgs e)
-    {
-        try
-        {
-            var program = _programParser.Parse("program", ProgramEditor.Text ?? string.Empty);
-            RunProgram(program);
-        }
-        catch (FormatException ex)
-        {
-            ResultLabel.Text = ex.Message;
-        }
-    }
-
-    private void OnRunExampleClicked(object? sender, EventArgs e)
-    {
-        if (ExamplePicker.SelectedIndex < 0)
-        {
-            ResultLabel.Text = "Kies eerst een voorbeeld.";
-            return;
-        }
-
-        RunProgram(_examplePrograms[ExamplePicker.SelectedIndex]);
-    }
-
-    //loads a random program of the chosen level into the program editor
+    //puts random program of the chosen level in the program editor
     private void OnLoadRandomClicked(object? sender, EventArgs e)
     {
         if (LevelPicker.SelectedIndex < 0)
         {
-            ResultLabel.Text = "Kies eerst een niveau.";
+            ShowStatus("Kies eerst een niveau.", ErrorColor);
             return;
         }
 
         var level = Enum.GetValues<ExampleLevel>()[LevelPicker.SelectedIndex];
-        var program = _examples.GetRandom(level);
-
-        ProgramEditor.Text = _programWriter.ToText(program);
-        ResultLabel.Text = $"Willekeurig {level} programma geladen: {program.Name}.";
+        LoadIntoEditor(_examples.GetRandom(level));
     }
 
-    //opens an exercise file and shows its grid and description
+    //puts the chosen example program in the program editor
+    private void OnLoadExampleClicked(object? sender, EventArgs e)
+    {
+        if (ExamplePicker.SelectedIndex < 0)
+        {
+            ShowStatus("Kies eerst een voorbeeld.", ErrorColor);
+            return;
+        }
+
+        LoadIntoEditor(_examplePrograms[ExamplePicker.SelectedIndex]);
+    }
+
+    //opens  e xrcise file and shows its grid right away with character on the start cell
     private async void OnLoadExerciseClicked(object? sender, EventArgs e)
     {
         var file = await FilePicker.Default.PickAsync(new PickOptions
@@ -159,109 +174,123 @@ public partial class MainPage : ContentPage
 
         try
         {
-            _currentExercise = _exerciseLoader.Load(file.FullPath);
+            var exercise = _exerciseLoader.Load(file.FullPath);
+            var grid = _gridParser.Parse(exercise.GridText);
 
-            GridEditor.Text = _currentExercise.GridText;
-            ExerciseDescriptionLabel.Text = _currentExercise.Description;
-            ExerciseLabel.Text = string.Empty;
+            GridEditor.Text = exercise.GridText;
+            ExerciseDescriptionLabel.Text = exercise.Description;
+            OutputEditor.Text = string.Empty;
+
+            _drawable.Update(grid, [grid.StartPosition], Direction.East);
+            GridView.Invalidate();
+
+            ShowStatus($"Oefening '{exercise.Name}' geladen. Schrijf een programma dat de x bereikt.",
+                NeutralColor);
         }
         catch (FormatException ex)
         {
-            ExerciseLabel.Text = ex.Message;
+            ShowStatus($"Dit bestand is geen geldige oefening. {ex.Message}", ErrorColor);
         }
         catch (IOException ex)
         {
-            ExerciseLabel.Text = ex.Message;
+            ShowStatus(ex.Message, ErrorColor);
         }
     }
 
-    //runs the program in the editor on the grid of the loaded exercise and checks if it is solved
-    private void OnCheckExerciseClicked(object? sender, EventArgs e)
+    private void OnClearGridClicked(object? sender, EventArgs e)
     {
-        if (_currentExercise is null)
+        GridEditor.Text = string.Empty;
+        ExerciseDescriptionLabel.Text = "Laad een oefening, of typ zelf een grid. Laat het grid leeg om vrij te tekenen.";
+        _drawable.Clear();
+        GridView.Invalidate();
+        ShowStatus("Grid gewist, programma's lopen nu zonder grid.", NeutralColor);
+    }
+
+    //runs the program on the grid
+    private void RunProgram(GridProgram program)
+    {
+        DomainGrid? grid;
+        try
         {
-            ExerciseLabel.Text = "Laad eerst een oefening.";
+            grid = string.IsNullOrWhiteSpace(GridEditor.Text) ? null : _gridParser.Parse(GridEditor.Text);
+        }
+        catch (FormatException ex)
+        {
+            ShowStatus($"Het grid klopt niet: {ex.Message}", ErrorColor);
             return;
         }
 
-        try
-        {
-            var program = _programParser.Parse("oefening", ProgramEditor.Text ?? string.Empty);
-
-            GridEditor.Text = _currentExercise.GridText;
-            RunProgram(program);
-
-            ExerciseLabel.Text = _exerciseChecker.IsSolved(program, _currentExercise)
-                ? $"Opgelost: '{_currentExercise.Name}' is gehaald."
-                : "Nog niet opgelost: de x is niet bereikt zonder tegen een muur of de rand te lopen.";
-        }
-        catch (FormatException ex)
-        {
-            ExerciseLabel.Text = ex.Message;
-        }
-    }
-
-    //runs a program on the grid that is typed in the grid editor and shows the result and metrics
-    //the path is drawn also when the program stops with an error, so the user sees how far the character got
-    private void RunProgram(GridProgram program)
-    {
-        DomainGrid? grid = null;
-        IReadOnlyList<Position> path = [];
+        //without grid the character starts at 0,0 in a grid on the start cell; always facing east
+        var start = grid?.StartPosition ?? new Position(0, 0);
+        var character = new Character(start.X, start.Y, Direction.East);
 
         try
         {
-            if (string.IsNullOrWhiteSpace(GridEditor.Text))
-            {
-                ResultLabel.Text = "Vul eerst een grid in.";
-            }
-            else
-            {
-                grid = _gridParser.Parse(GridEditor.Text);
+            var result = grid is null
+                ? _executor.Execute(program, character)
+                : _executor.Execute(program, grid, character);
 
-                var start = FindStart(grid);
-                var character = new Character(start.X, start.Y, Direction.East);
-
-                var result = _executor.Execute(program, grid, character);
-                path = result.Path;
-                ResultLabel.Text = result.ToString();
-            }
-        }
-        catch (FormatException ex)
-        {
-            ResultLabel.Text = ex.Message;
+            OutputEditor.Text = FormatTrace(result.Trace) + result.FormatEndState();
+            _drawable.Update(grid, result.Path, result.FinalDirection);
+            ShowOutcome(grid, result);
         }
         catch (ProgramRuntimeException ex)
         {
-            path = ex.Path;
-            ResultLabel.Text = $"Fout: {ex.Message}";
+           
+            OutputEditor.Text = FormatTrace(ex.Trace) + $"Gestopt op ({character.X},{character.Y}): {ex.Message}";
+            _drawable.Update(grid, ex.Path, character.Direction);
+            ShowStatus($"Runtime error: {ex.Message}", ErrorColor);
         }
 
-        if (grid is not null)
-        {
-            _drawable.Update(grid, path);
-            GridView.Invalidate();
-        }
-
-        var metrics = _metrics.Calculate(program);
-        MetricsLabel.Text = $"Commando's: {metrics.CommandCount}, " +
-                            $"maximale nesting: {metrics.MaxNestingLevel}, " +
-                            $"herhalingen: {metrics.RepeatCount}";
+        GridView.Invalidate();
     }
 
-    //the start cell (s) in the grid, or (0,0) when the grid has none
-    private static Position FindStart(DomainGrid grid)
+    //with an exit n the grid the run is a success or a failure
+    private void ShowOutcome(DomainGrid? grid, ExecutionResult result)
     {
-        for (var y = 0; y < grid.Height; y++)
+        if (grid?.Find(CellType.Exit) is not { } exit)
         {
-            for (var x = 0; x < grid.Width; x++)
-            {
-                if (grid.GetCell(new Position(x, y)) == CellType.Start)
-                {
-                    return new Position(x, y);
-                }
-            }
+            ShowStatus("Programma uitgevoerd.", NeutralColor);
         }
+        else if (_exerciseChecker.ReachedExit(grid, result))
+        {
+            ShowStatus("Gelukt! Het karakter heeft de x bereikt.", SuccessColor);
+        }
+        else
+        {
+            ShowStatus($"Niet gelukt: het karakter eindigt op ({result.FinalX},{result.FinalY}), " +
+                       $"de x staat op ({exit.X},{exit.Y}).", FailureColor);
+        }
+    }
 
-        return new Position(0, 0);
+    //parses the program editor
+    private bool TryParseProgram(string name, out GridProgram program)
+    {
+        try
+        {
+            program = _programParser.Parse(name, ProgramEditor.Text ?? string.Empty);
+            return true;
+        }
+        catch (FormatException ex)
+        {
+            program = new GridProgram(name, []);
+            ShowStatus($"Fout in het programma: {ex.Message}", ErrorColor);
+            return false;
+        }
+    }
+
+    private void LoadIntoEditor(GridProgram program)
+    {
+        ProgramEditor.Text = _programWriter.ToText(program);
+        ShowStatus($"Programma '{program.Name}' geladen. Druk op Uitvoeren.", NeutralColor);
+    }
+
+    private static string FormatTrace(IReadOnlyList<string> trace) =>
+        trace.Count == 0 ? string.Empty : string.Join(Environment.NewLine, trace) + Environment.NewLine + Environment.NewLine;
+
+    private void ShowStatus(string message, Color color)
+    {
+        StatusLabel.Text = message;
+        StatusLabel.TextColor = color;
     }
 }

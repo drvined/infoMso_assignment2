@@ -8,7 +8,6 @@ public class RepeatUntilTests
     [Fact]
     public void RepeatUntilWallAhead_StopsJustBeforeTheWall()
     {
-        //3 wide and 2 high, the cell at (2,0) is blocked
         var cells = new CellType[3, 2];
         cells[2, 0] = CellType.Blocked;
         var grid = new Grid(cells);
@@ -25,7 +24,6 @@ public class RepeatUntilTests
     [Fact]
     public void RepeatUntil_WithConditionThatNeverBecomesTrue_IsStoppedByStepLimit()
     {
-        //no grid, so WallAhead is always false and the loop would run forever
         var state = new ExecutionState(new Character(0, 0, Direction.East), null, maxSteps: 5);
         var loop = new RepeatUntil(new WallAheadCondition(), new List<Command> { new Turn(TurnSide.Left) });
 

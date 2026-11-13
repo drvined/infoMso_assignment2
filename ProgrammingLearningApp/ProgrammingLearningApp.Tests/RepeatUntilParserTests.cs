@@ -10,7 +10,6 @@ public class RepeatUntilParserTests
     [Fact]
     public void Parse_RepeatUntilWallAhead_RunsUntilTheWall()
     {
-        //3 wide and 2 high, the cell at (2,0) is blocked
         var cells = new CellType[3, 2];
         cells[2, 0] = CellType.Blocked;
         var grid = new Grid(cells);
@@ -22,6 +21,29 @@ public class RepeatUntilParserTests
 
         Assert.Equal(1, result.FinalX);
         Assert.Equal(0, result.FinalY);
+    }
+
+    [Fact]
+    public void Parse_RepeatUntilAsOneWord_IsAlsoARepeatUntil()
+    {
+        var program = new ProgramParser().Parse("test", "RepeatUntil GridEdge\n    Move 1");
+
+        var repeatUntil = Assert.IsType<RepeatUntil>(Assert.Single(program.Commands));
+        Assert.IsType<GridEdgeCondition>(repeatUntil.Condition);
+        Assert.IsType<Move>(Assert.Single(repeatUntil.Commands));
+    }
+
+    [Fact]
+    public void Parse_FindExit1FromTheAssignment_IsParsed()
+    {
+        const string findExit1 =
+            "Repeat 3\n    RepeatUntil WallAhead\n        Move 1\n    Turn right\n" +
+            "Repeat 2\n    RepeatUntil GridEdge\n        Move 1\n    Turn right";
+
+        var program = new ProgramParser().Parse("FindExit1", findExit1);
+
+        Assert.Equal(2, program.Commands.Count);
+        Assert.All(program.Commands, command => Assert.IsType<Repeat>(command));
     }
 
     [Fact]

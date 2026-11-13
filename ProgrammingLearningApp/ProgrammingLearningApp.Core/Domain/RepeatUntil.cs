@@ -1,6 +1,6 @@
 ﻿namespace ProgrammingLearningApp.Domain;
 
-//the repeat until command: runs its commands again and again until the condition is true
+//the repeat until command runs its commands again and again until the condition is true
 //the condition is checked before every round, so when it is already true the commands never run
 public sealed class RepeatUntil : Command
 {
@@ -8,7 +8,6 @@ public sealed class RepeatUntil : Command
 
     public Condition Condition { get; }
 
-    //read only, the commands inside cant be changed from outside
     public IReadOnlyList<Command> Commands => _commands;
 
     public RepeatUntil(Condition condition, IEnumerable<Command> commands)

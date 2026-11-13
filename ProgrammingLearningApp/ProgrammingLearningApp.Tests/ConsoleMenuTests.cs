@@ -9,7 +9,6 @@ namespace ProgrammingLearningApp.Tests;
 
 public class ConsoleMenuTests
 {
-    //rns the menu with the given keyboard input and returns everything it printed.
     private static string Run(string input)
     {
         var output = new StringWriter();

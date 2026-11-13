@@ -1,7 +1,7 @@
 ﻿namespace ProgrammingLearningApp.Domain;
 
-//true when the cell directly in front of the character is a wall
-//without a grid there are no walls, so the answer is false
+//true when the cell directly in front of character is a wall
+//without grid there are no walls, so answer is false
 public sealed class WallAheadCondition : Condition
 {
     public override bool IsTrue(ExecutionState state)

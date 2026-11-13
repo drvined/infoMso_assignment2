@@ -37,4 +37,25 @@ public sealed class Grid
 
     public bool IsBlocked(Position position) =>
         Contains(position) && GetCell(position) == CellType.Blocked;
+
+    //where the character starts: the s cell, or the top-left cell when the grid has no s
+    //(the assignment says the character starts top-left, the s is optional)
+    public Position StartPosition => Find(CellType.Start) ?? new Position(0, 0);
+
+    //the first cell of this type, reading row by row from the top-left, or null when there is none
+    public Position? Find(CellType type)
+    {
+        for (var y = 0; y < Height; y++)
+        {
+            for (var x = 0; x < Width; x++)
+            {
+                if (_cells[x, y] == type)
+                {
+                    return new Position(x, y);
+                }
+            }
+        }
+
+        return null;
+    }
 }

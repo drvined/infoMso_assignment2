@@ -2,7 +2,7 @@ using ProgrammingLearningApp.Domain;
 
 namespace ProgrammingLearningApp.Export;
 
-//writes a program back to the text format, so it can be saved and read again with ProgramParser
+//writes program back to the text format
 public sealed class ProgramWriter : IProgramExporter
 {
     private const string Indent = "    ";
@@ -23,7 +23,6 @@ public sealed class ProgramWriter : IProgramExporter
         return string.Join(Environment.NewLine, lines) + Environment.NewLine;
     }
 
-    //the name of a condition as it is written in the program text, also used by the JSON exporter
     internal static string ConditionName(Condition condition) => condition switch
     {
         WallAheadCondition => "WallAhead",
@@ -31,7 +30,6 @@ public sealed class ProgramWriter : IProgramExporter
         _ => throw new NotSupportedException($"Cannot write a condition of type {condition.GetType().Name}.")
     };
 
-    //one line per command, the commands inside a repeat are indented one level deeper
     private static void WriteCommands(IEnumerable<Command> commands, int level, List<string> lines)
     {
         var indent = string.Concat(Enumerable.Repeat(Indent, level));

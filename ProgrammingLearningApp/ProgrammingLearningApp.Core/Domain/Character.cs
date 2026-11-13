@@ -9,12 +9,10 @@ public sealed class Character
 
     public Position Position => new(X, Y);
 
-    //new character starts at (0,0) facing east like in the assignment
     public Character() : this(0, 0, Direction.East)
     {
     }
 
-    //start somewhere else handy for tests
     public Character(int x, int y, Direction direction)
     {
         X = x;
@@ -22,7 +20,6 @@ public sealed class Character
         Direction = direction;
     }
 
-    //only the direction changes position stays the same
     public void TurnLeft() => Direction = Direction.TurnLeft();
 
     public void TurnRight() => Direction = Direction.TurnRight();

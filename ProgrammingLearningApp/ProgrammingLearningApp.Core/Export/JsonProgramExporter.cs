@@ -3,7 +3,7 @@ using ProgrammingLearningApp.Domain;
 
 namespace ProgrammingLearningApp.Export;
 
-//writes a program as JSON: a name and a list of commands, repeats hold their own list of commands
+//writes a program as json
 public sealed class JsonProgramExporter : IProgramExporter
 {
     private static readonly JsonSerializerOptions Options = new() { WriteIndented = true };

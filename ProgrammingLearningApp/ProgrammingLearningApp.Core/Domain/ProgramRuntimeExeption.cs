@@ -9,4 +9,7 @@ public class ProgramRuntimeException : Exception
 
     //the cells the character walked over before the error happened, so the error can still be drawn
     public IReadOnlyList<Position> Path { get; internal set; } = [];
+
+    //the commands that were finished before the error happened, so the trace can still be shown
+    public IReadOnlyList<string> Trace { get; internal set; } = [];
 }

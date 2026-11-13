@@ -2,11 +2,9 @@ using ProgrammingLearningApp.Domain;
 
 namespace ProgrammingLearningApp.Metrics;
 
-//calculates the metrics from the assignment: number of commands, max nesting and number of repeats
-//a repeat and a repeat until both count as a repeat
+//calculates the metrics number of commands, max nesting and number of repeats a repeat and a repeat until both count as a repeat
 public sealed class MetricsCalculator
 {
-    //walks through the whole program once and puts the 3 numbers in a ProgramMetrics
     public ProgramMetrics Calculate(GridProgram program)
     {
         var counter = new Counter();
@@ -15,7 +13,6 @@ public sealed class MetricsCalculator
         return new ProgramMetrics(counter.Commands, counter.MaxNesting, counter.Repeats);
     }
 
-    //goes over every command at this level, when it finds a repeat it calls itself again one level deeper
     private static void CountCommands(IEnumerable<Command> commands, int nestingLevel, Counter counter)
     {
         foreach (var command in commands)

@@ -67,6 +67,26 @@ public class ProgramParserTests
         Assert.Throws<FormatException>(() => TestPrograms.Parse("Repeat 2 times"));
     }
 
+    [Theory]
+    [InlineData("Move 1\rTurn right\rMove 2")]
+    [InlineData("Move 1\r\nTurn right\r\nMove 2")]
+    [InlineData("Move 1\nTurn right\nMove 2")]
+    public void Parse_WorksWithEveryKindOfLineEnding(string text)
+    {
+        GridProgram program = TestPrograms.Parse(text);
+
+        Assert.Equal(3, program.Commands.Count);
+    }
+
+    [Fact]
+    public void RepeatWithoutTimes_IsAlsoARepeat()
+    {
+        GridProgram program = TestPrograms.Parse("Repeat 3\n    Move 1");
+
+        Repeat repeat = Assert.IsType<Repeat>(Assert.Single(program.Commands));
+        Assert.Equal(3, repeat.Times);
+    }
+
     [Fact]
     public void TabIndentation_Throws()
     {

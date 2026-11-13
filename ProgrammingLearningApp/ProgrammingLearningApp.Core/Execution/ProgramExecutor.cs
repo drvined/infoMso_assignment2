@@ -2,19 +2,17 @@ using ProgrammingLearningApp.Domain;
 
 namespace ProgrammingLearningApp.Execution;
 
-//runs a program on a character and keeps a trace of every move and turn that happened
-//the commands run themselves (Command.Execute), the executor only sets up the state
-//and collects the result, so it doesnt change when a new command is added
+//runs a program on character and keeps a trace of every move and turn that happened
 public sealed class ProgramExecutor : IProgramRunner
 {
-    //runs the program on a new character that starts at (0,0) facing east
+    //runs program on new character that starts at 0,0 facing east
     public ExecutionResult Execute(GridProgram program) => Execute(program, new Character());
 
-    //runs the program on a character without a grid, so no wall or edge checks
+    //runs the program character without grid
     public ExecutionResult Execute(GridProgram program, Character character) =>
         Run(program, new ExecutionState(character));
 
-    //runs the program on a character inside a grid, walls and edges are checked on every step
+    //runs  program on character inside grid
     public ExecutionResult Execute(GridProgram program, Grid grid, Character character)
     {
         ArgumentNullException.ThrowIfNull(grid);
@@ -35,8 +33,8 @@ public sealed class ProgramExecutor : IProgramRunner
         }
         catch (ProgramRuntimeException ex)
         {
-            //keeps the path walked so far, so the UI can still draw where the character went
             ex.Path = state.Path.ToList();
+            ex.Trace = state.Trace.ToList();
             throw;
         }
 

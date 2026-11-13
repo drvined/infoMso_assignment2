@@ -10,7 +10,6 @@ public class PartialPathTests
     [Fact]
     public void RuntimeError_KeepsThePathWalkedSoFar()
     {
-        //5 wide, the cell at (4,0) is a wall, so Move 10 stops at (3,0)
         var grid = new GridParser().Parse("sooo+");
         var program = new ProgramParser().Parse("test", "Move 10");
 

@@ -2,14 +2,13 @@ using ProgrammingLearningApp.Parsing;
 
 namespace ProgrammingLearningApp.Exercises;
 
-//reads a pathfinding exercise from a text file: the content of the file is the grid
-//and the name of the exercise is the file name without extension
+//reads a pathfinding exercise from text file
 public sealed class ExerciseLoader
 {
     private readonly GridParser _gridParser = new();
     private readonly IFileReader _fileReader;
 
-    //the reader is a parameter so tests can pass a fake; by default the disk is used
+    // reader is a parameter so tests can pass a fake
     public ExerciseLoader(IFileReader? fileReader = null)
     {
         _fileReader = fileReader ?? new FileSystemFileReader();
@@ -26,7 +25,6 @@ public sealed class ExerciseLoader
 
         var gridText = _fileReader.ReadAllText(path);
 
-        //parses the grid once, so a broken file is reported when it is loaded and not when a program runs
         _gridParser.Parse(gridText);
 
         var name = Path.GetFileNameWithoutExtension(path);
