@@ -10,20 +10,28 @@ public sealed class ProgramExecutor
     //runs the program on a new character that starts at (0,0) facing east
     public ExecutionResult Execute(GridProgram program) => Execute(program, new Character());
 
-    //runs the program on a character, that character gets changed
-    //at the end the trace, the path and where the character ended up go into ExecutionResult
-    public ExecutionResult Execute(GridProgram program, Character character)
+    //runs the program on a character without a grid, so no wall or edge checks
+    public ExecutionResult Execute(GridProgram program, Character character) =>
+        Run(program, new ExecutionState(character));
+
+    //runs the program on a character inside a grid, walls and edges are checked on every step
+    public ExecutionResult Execute(GridProgram program, Grid grid, Character character)
+    {
+        ArgumentNullException.ThrowIfNull(grid);
+
+        return Run(program, new ExecutionState(character, grid));
+    }
+
+    private static ExecutionResult Run(GridProgram program, ExecutionState state)
     {
         ArgumentNullException.ThrowIfNull(program);
-        ArgumentNullException.ThrowIfNull(character);
-
-        var state = new ExecutionState(character);
 
         foreach (var command in program.Commands)
         {
             command.Execute(state);
         }
 
+        var character = state.Character;
         return new ExecutionResult(state.Trace, state.Path, character.X, character.Y, character.Direction);
     }
 }

@@ -24,4 +24,17 @@ public sealed class Grid
 
     public bool Contains(Position position) =>
         position.X >= 0 && position.X < Width && position.Y >= 0 && position.Y < Height;
+
+    public CellType GetCell(Position position)
+    {
+        if (!Contains(position))
+        {
+            throw new ArgumentOutOfRangeException(nameof(position), position, "Position is outside the grid.");
+        }
+
+        return _cells[position.X, position.Y];
+    }
+
+    public bool IsBlocked(Position position) =>
+        Contains(position) && GetCell(position) == CellType.Blocked;
 }
