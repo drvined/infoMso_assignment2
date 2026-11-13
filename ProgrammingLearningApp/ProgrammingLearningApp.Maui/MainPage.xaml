@@ -2,37 +2,134 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="ProgrammingLearningApp.Maui.MainPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="#16161A"
              Title="Programming Learning App">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="20" Spacing="12">
-            <Label Text="Programma" FontSize="18" />
-            <Editor x:Name="ProgramEditor" HeightRequest="150"
-                    Placeholder="Bijvoorbeeld: Move, Turn, Repeat" />
-            <Button Text="Programma uitvoeren" Clicked="OnRunClicked" />
-            <Button Text="Bestand importeren" Clicked="OnImportClicked" />
-            <Picker x:Name="ExportFormatPicker" Title="Kies een exportformaat" />
-            <Button Text="Programma exporteren" Clicked="OnExportClicked" />
+    <ContentPage.Resources>
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="BackgroundColor" Value="#212126" />
+            <Setter Property="Stroke" Value="#2E2E35" />
+            <Setter Property="StrokeThickness" Value="1" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 12" />
+            <Setter Property="Padding" Value="16" />
+        </Style>
+        <Style x:Key="CardTitle" TargetType="Label">
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="TextColor" Value="#ECECF1" />
+        </Style>
+        <Style x:Key="Hint" TargetType="Label">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextColor" Value="#8B8B96" />
+        </Style>
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="BackgroundColor" Value="#7C5CFF" />
+            <Setter Property="TextColor" Value="White" />
+            <Setter Property="FontAttributes" Value="Bold" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="16,8" />
+            <Setter Property="MinimumHeightRequest" Value="36" />
+        </Style>
+        <Style x:Key="SecondaryButton" TargetType="Button">
+            <Setter Property="BackgroundColor" Value="#2E2E35" />
+            <Setter Property="TextColor" Value="#ECECF1" />
+            <Setter Property="CornerRadius" Value="8" />
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="MinimumHeightRequest" Value="36" />
+        </Style>
+        <Style x:Key="CodeEditor" TargetType="Editor">
+            <Setter Property="FontFamily" Value="Consolas" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="BackgroundColor" Value="#16161A" />
+            <Setter Property="TextColor" Value="#ECECF1" />
+            <Setter Property="PlaceholderColor" Value="#5F5F6B" />
+        </Style>
+    </ContentPage.Resources>
 
-            <Label Text="Voorbeeld" FontSize="18" />
-            <Picker x:Name="ExamplePicker" Title="Kies een voorbeeld" />
-            <Button Text="Voorbeeld uitvoeren" Clicked="OnRunExampleClicked" />
-            <Picker x:Name="LevelPicker" Title="Kies een niveau" />
-            <Button Text="Willekeurig programma laden" Clicked="OnLoadRandomClicked" />
+    <Grid ColumnDefinitions="460,*" RowDefinitions="Auto,*" ColumnSpacing="20" RowSpacing="16" Padding="24">
 
-            <Label Text="Pathfinding-oefening" FontSize="18" />
-            <Button Text="Oefening laden uit bestand" Clicked="OnLoadExerciseClicked" />
-            <Label x:Name="ExerciseDescriptionLabel" />
-            <Button Text="Oefening controleren" Clicked="OnCheckExerciseClicked" />
-            <Label x:Name="ExerciseLabel" />
-
-            <Label Text="Grid" FontSize="18" />
-            <Editor x:Name="GridEditor" HeightRequest="150"
-                    Placeholder="Gebruik o, +, x en s" />
-
-            <Label x:Name="ResultLabel" />
-            <Label x:Name="MetricsLabel" />
-            <GraphicsView x:Name="GridView" HeightRequest="250" />
+        <VerticalStackLayout Grid.ColumnSpan="2" Spacing="2">
+            <Label Text="Programming Learning App" FontSize="24" FontAttributes="Bold" TextColor="#ECECF1" />
+            <Label Text="Schrijf een programma, voer het uit en bekijk het pad."
+                   Style="{StaticResource Hint}" FontSize="13" />
         </VerticalStackLayout>
-    </ScrollView>
+
+
+        <ScrollView Grid.Row="1" Grid.Column="0">
+            <VerticalStackLayout Spacing="16">
+
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Programma" Style="{StaticResource CardTitle}" />
+                        <Editor x:Name="ProgramEditor" Style="{StaticResource CodeEditor}" HeightRequest="220"
+                                Placeholder="Bijvoorbeeld:&#10;Repeat 4&#10;    Move 10&#10;    Turn right" />
+                        <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                            <Button Text="▶  Uitvoeren" Style="{StaticResource PrimaryButton}" Clicked="OnRunClicked" />
+                            <Button Grid.Column="1" Text="Metrics" Style="{StaticResource SecondaryButton}"
+                                    Clicked="OnMetricsClicked" />
+                        </Grid>
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                            <Button Text="Importeren" Style="{StaticResource SecondaryButton}"
+                                    VerticalOptions="End" Clicked="OnImportClicked" />
+                            <Picker Grid.Column="1" x:Name="ExportFormatPicker" Title="Exportformaat" />
+                            <Button Grid.Column="2" Text="Exporteren" Style="{StaticResource SecondaryButton}"
+                                    VerticalOptions="End" Clicked="OnExportClicked" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Voorbeeldprogramma's" Style="{StaticResource CardTitle}" />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <Picker x:Name="LevelPicker" Title="Niveau" />
+                            <Button Grid.Column="1" Text="Willekeurig laden" Style="{StaticResource SecondaryButton}"
+                                    VerticalOptions="End" Clicked="OnLoadRandomClicked" />
+                        </Grid>
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <Picker x:Name="ExamplePicker" Title="Of kies een voorbeeld" />
+                            <Button Grid.Column="1" Text="Laden" Style="{StaticResource SecondaryButton}"
+                                    VerticalOptions="End" Clicked="OnLoadExampleClicked" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource Card}">
+                    <VerticalStackLayout Spacing="10">
+                        <Label Text="Pathfinding-oefening" Style="{StaticResource CardTitle}" />
+                        <Label x:Name="ExerciseDescriptionLabel" Style="{StaticResource Hint}" FontSize="13"
+                               Text="Laad een oefening, of typ zelf een grid. Laat het grid leeg om vrij te tekenen." />
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <Button Text="Oefening laden" Style="{StaticResource SecondaryButton}"
+                                    Clicked="OnLoadExerciseClicked" />
+                            <Button Grid.Column="1" Text="Grid wissen" Style="{StaticResource SecondaryButton}"
+                                    Clicked="OnClearGridClicked" />
+                        </Grid>
+                        <Editor x:Name="GridEditor" Style="{StaticResource CodeEditor}" HeightRequest="140"
+                                Placeholder="Bijvoorbeeld:&#10;oo+++&#10;+oo++&#10;++oox" />
+                        <Label Text="o = open   + = muur   x = eind   s = start (anders linksboven)"
+                               Style="{StaticResource Hint}" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="1" Grid.Column="1" RowDefinitions="*,Auto" RowSpacing="16">
+            <Border Style="{StaticResource Card}" Padding="20">
+                <GraphicsView x:Name="GridView" />
+            </Border>
+
+            <Border Grid.Row="1" Style="{StaticResource Card}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Uitvoer" Style="{StaticResource CardTitle}" />
+                    <Label x:Name="StatusLabel" FontSize="14" FontAttributes="Bold" TextColor="#ECECF1" />
+                    <Editor x:Name="OutputEditor" Style="{StaticResource CodeEditor}" HeightRequest="150"
+                            IsReadOnly="True" Placeholder="Hier komt de trace of de metrics." />
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+    </Grid>
 </ContentPage>

@@ -5,7 +5,6 @@ namespace ProgrammingLearningApp.Tests;
 
 public class GridTests
 {
-    //3 wide and 2 high, only the cell at (1,0) is blocked
     private static Grid CreateGrid()
     {
         var cells = new CellType[3, 2];
@@ -46,5 +45,35 @@ public class GridTests
     public void IsBlocked_FalseOutsideTheGrid()
     {
         Assert.False(CreateGrid().IsBlocked(new Position(3, 0)));
+    }
+
+    [Fact]
+    public void Find_ReturnsTheFirstCellOfThatType()
+    {
+        var found = CreateGrid().Find(CellType.Blocked);
+
+        Assert.NotNull(found);
+        Assert.Equal(new Position(1, 0), found.Value);
+    }
+
+    [Fact]
+    public void Find_NullWhenTheTypeIsNotInTheGrid()
+    {
+        Assert.Null(CreateGrid().Find(CellType.Exit));
+    }
+
+    [Fact]
+    public void StartPosition_IsTheStartCell()
+    {
+        var cells = new CellType[3, 2];
+        cells[2, 1] = CellType.Start;
+
+        Assert.Equal(new Position(2, 1), new Grid(cells).StartPosition);
+    }
+
+    [Fact]
+    public void StartPosition_IsTopLeftWhenThereIsNoStartCell()
+    {
+        Assert.Equal(new Position(0, 0), CreateGrid().StartPosition);
     }
 }

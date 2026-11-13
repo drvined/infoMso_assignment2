@@ -43,7 +43,6 @@ public class CharacterTests
         Assert.Equal(expected, character.Direction);
     }
 
-    // Assumption from the assignment's example: south increases Y, north decreases Y.
     [Theory]
     [InlineData(Direction.North, 0, -1)]
     [InlineData(Direction.South, 0, 1)]

@@ -30,7 +30,6 @@ public class CommandTests
         Assert.Equal(new Command[] { move, turn }, repeat.Commands);
     }
 
-    //the commands run themselves, so they can be tested without the executor
     [Fact]
     public void Move_Execute_WalksAndAddsToTrace()
     {

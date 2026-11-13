@@ -2,7 +2,7 @@
 
 namespace ProgrammingLearningApp.Export;
 
-//turns an execution result into plain text and can save that text as a .txt file
+//turns execution result into text and can save as  .txt file
 public sealed class TextExporter
 {
     public string ToText(ExecutionResult result)

@@ -6,7 +6,6 @@ namespace ProgrammingLearningApp.Tests;
 
 public class GridParserTests
 {
-    //Checks if the grid gets the right width and highth
     [Fact]
     public void Parse_GivesCorrectWidthAndHeight()
     {
@@ -16,7 +15,6 @@ public class GridParserTests
         Assert.Equal(2, grid.Height);
     }
 
-    // Checks if Contains is true inside and false outside of the grid
     [Fact]
     public void Contains_IsTrueInsideTheGrid_AndFalseOutside()
     {
@@ -28,15 +26,23 @@ public class GridParserTests
         Assert.False(grid.Contains(new Position(0, 2)));
         Assert.False(grid.Contains(new Position(-1, 0)));
     }
-
-    // Checks if a different character gives an error
     [Fact]
     public void Parse_UnknownCharacter_Throws()
     {
         Assert.Throws<FormatException>(() => new GridParser().Parse("oz"));
     }
+    [Theory]
+    [InlineData("ooo+\roooo")]
+    [InlineData("ooo+\r\noooo")]
+    [InlineData("ooo+\noooo\n")]
+    public void Parse_WorksWithEveryKindOfLineEnding(string text)
+    {
+        var grid = new GridParser().Parse(text);
 
-    //If rows have different lengths it gives an error
+        Assert.Equal(4, grid.Width);
+        Assert.Equal(2, grid.Height);
+    }
+
     [Fact]
     public void Parse_RowsOfDifferentLength_Throws()
     {

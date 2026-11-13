@@ -79,6 +79,36 @@ public class ExerciseCheckerTests
         Assert.False(checker.IsSolved(new GridProgram("fake", []), Straight));
     }
 
+    //the grid format of the assignment has no s: the character then starts top-left
+    [Fact]
+    public void ExerciseWithoutStartCell_StartsTopLeft()
+    {
+        var withoutStart = new PathfindingExercise("Zonder s", "", "oo+\n+ox");
+
+        Assert.True(_checker.IsSolved(_parser.Parse("test", "Move 1\nTurn right\nMove 1\nTurn left\nMove 1"),
+            withoutStart));
+    }
+
+    [Fact]
+    public void ReachedExit_TrueOnlyWhenTheRunEndsOnTheX()
+    {
+        var grid = new GridParser().Parse("soox");
+        var onExit = new ExecutionResult([], [new Position(3, 0)], 3, 0, Direction.East);
+        var beforeExit = new ExecutionResult([], [new Position(2, 0)], 2, 0, Direction.East);
+
+        Assert.True(_checker.ReachedExit(grid, onExit));
+        Assert.False(_checker.ReachedExit(grid, beforeExit));
+    }
+
+    [Fact]
+    public void ReachedExit_FalseWhenTheGridHasNoExit()
+    {
+        var grid = new GridParser().Parse("sooo");
+        var result = new ExecutionResult([], [new Position(3, 0)], 3, 0, Direction.East);
+
+        Assert.False(_checker.ReachedExit(grid, result));
+    }
+
     [Fact]
     public void IsSolved_FalseWhenTheRunnerReportsARuntimeError()
     {

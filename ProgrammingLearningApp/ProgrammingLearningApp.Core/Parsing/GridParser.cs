@@ -2,16 +2,14 @@
 
 namespace ProgrammingLearningApp.Parsing;
 
-// Reads a grid from text. Each line is a row and each character is a cell.
+//read grid from text each line is a row and each character is a cell
 public sealed class GridParser
 {
     public Grid Parse(string text)
     {
         ArgumentNullException.ThrowIfNull(text);
 
-        var rows = text
-            .Split('\n')
-            .Select(row => row.TrimEnd('\r'))
+        var rows = TextLines.Split(text)
             .Where(row => row.Length > 0)
             .ToList();
 

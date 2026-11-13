@@ -2,7 +2,7 @@ using ProgrammingLearningApp.Domain;
 
 namespace ProgrammingLearningApp.Execution;
 
-//runs a program on a grid. Code that needs a run depends on this interface,
+//runs a program on a grid code that needs a run depends on this interface
 //so tests can replace the real executor with a fake
 public interface IProgramRunner
 {

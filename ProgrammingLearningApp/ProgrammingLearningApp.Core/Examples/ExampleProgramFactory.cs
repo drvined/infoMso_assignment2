@@ -5,12 +5,11 @@ namespace ProgrammingLearningApp.Examples;
 public enum ExampleLevel
 {
     Basic,     // only moves and turns
-    Advanced,  // uses a repeat
+    Advanced,  // uses repeat
     Expert     // uses nested repeats
 }
 
 //factory that builds the hardcoded example programs directly as objects
-//so the rest of the app never has to know how they are put together.
 public sealed class ExampleProgramFactory
 {
     private readonly Random _random;
@@ -19,7 +18,6 @@ public sealed class ExampleProgramFactory
     {
     }
 
-    // A fixed Random (e.g. new Random(42)) makes GetRandom predictable in tests.
     public ExampleProgramFactory(Random random)
     {
         ArgumentNullException.ThrowIfNull(random);

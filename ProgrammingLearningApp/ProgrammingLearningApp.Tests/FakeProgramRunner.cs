@@ -3,8 +3,6 @@ using ProgrammingLearningApp.Execution;
 
 namespace ProgrammingLearningApp.Tests;
 
-//a fake runner: it does not run the program, it returns the result or the error the test chooses,
-//and it remembers what it was asked to run
 public sealed class FakeProgramRunner : IProgramRunner
 {
     private readonly ExecutionResult? _result;

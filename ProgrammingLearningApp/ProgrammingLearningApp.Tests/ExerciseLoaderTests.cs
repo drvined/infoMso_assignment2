@@ -42,7 +42,6 @@ public class ExerciseLoaderTests
         }
     }
 
-    //with a fake reader the loader is tested without touching the disk
     [Fact]
     public void Load_WithFakeReader_ReturnsTheExercise()
     {
