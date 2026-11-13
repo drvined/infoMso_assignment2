@@ -75,4 +75,20 @@ public class ExerciseLoaderTests
         Directory.CreateDirectory(directory);
         return directory;
     }
+
+    //the exercise parses its grid once when it is created, the checker and the ui use that grid
+    [Fact]
+    public void Exercise_ParsesItsGridWhenCreated()
+    {
+        var exercise = new PathfindingExercise("test", "", "soo\no+x");
+
+        Assert.Equal(3, exercise.Grid.Width);
+        Assert.Equal(2, exercise.Grid.Height);
+    }
+
+    [Fact]
+    public void Exercise_WithInvalidGrid_ThrowsFormatException()
+    {
+        Assert.Throws<FormatException>(() => new PathfindingExercise("test", "", "s?x"));
+    }
 }

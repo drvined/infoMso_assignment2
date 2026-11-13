@@ -1,11 +1,8 @@
-using ProgrammingLearningApp.Parsing;
-
 namespace ProgrammingLearningApp.Exercises;
 
 //reads a pathfinding exercise from text file
 public sealed class ExerciseLoader
 {
-    private readonly GridParser _gridParser = new();
     private readonly IFileReader _fileReader;
 
     // reader is a parameter so tests can pass a fake
@@ -25,9 +22,8 @@ public sealed class ExerciseLoader
 
         var gridText = _fileReader.ReadAllText(path);
 
-        _gridParser.Parse(gridText);
-
+        //creating the exercise parses the grid, so a broken grid file gives a FormatException here
         var name = Path.GetFileNameWithoutExtension(path);
-        return new PathfindingExercise(name, $"Bereik de x in de oefening '{name}'.", gridText);
+        return new PathfindingExercise(name, $"Breng Juba naar de x in de oefening '{name}'.", gridText);
     }
 }

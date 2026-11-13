@@ -1,16 +1,11 @@
 namespace ProgrammingLearningApp.Domain;
 
 //the repeat command: runs its list of commands a number of times
-public sealed class Repeat : Command
+public sealed class Repeat : LoopCommand
 {
-    private readonly List<Command> _commands;
-
     public int Times { get; }
 
-    //rd only, the commands inside cant be changed from outside
-    public IReadOnlyList<Command> Commands => _commands;
-
-    public Repeat(int times, IEnumerable<Command> commands)
+    public Repeat(int times, IEnumerable<Command> commands) : base(commands)
     {
         if (times < 0)
         {
@@ -18,20 +13,16 @@ public sealed class Repeat : Command
         }
 
         Times = times;
-        _commands = commands.ToList();
     }
 
-    //runs the inner commands Times times, each inner command runs itself
+    //runs the inner commands Times times
     public override void Execute(ExecutionState state)
     {
         ArgumentNullException.ThrowIfNull(state);
 
         for (var i = 0; i < Times; i++)
         {
-            foreach (var command in _commands)
-            {
-                command.Execute(state);
-            }
+            ExecuteBody(state);
         }
     }
 }

@@ -78,10 +78,10 @@ public sealed class ExampleProgramFactory
             new Repeat(3, [new Move(1), TurnRight(), new Move(1), TurnLeft()])
         ]),
 
-        new GridProgram("FindExit3",
+        //FindExit2 from the assignment, only stops with a grid (without grid the condition is never true)
+        new GridProgram("FindExit2",
         [
-            new RepeatUntil(new WallAheadCondition(), [new Move(10)]),
-            TurnRight()
+            new RepeatUntil(new WallAheadCondition(), [new Move(10), TurnRight()])
         ])
     ];
 
@@ -108,17 +108,14 @@ public sealed class ExampleProgramFactory
             ])
         ]),
 
+        //FindExit1 from the assignment, only stops with a grid (without grid the condition is never true)
         new GridProgram("FindExit1",
         [
             new Repeat(3,
             [
                 new RepeatUntil(new WallAheadCondition(), [new Move(1)]),
                 TurnRight()
-            ])
-        ]),
-
-        new GridProgram("FindExit2",
-        [
+            ]),
             new Repeat(2,
             [
                 new RepeatUntil(new GridEdgeCondition(), [new Move(1)]),

@@ -23,11 +23,11 @@ public partial class MainPage : ContentPage
     private readonly ProgramExecutor _executor = new();
     private readonly MetricsCalculator _metrics = new();
     private readonly ExampleProgramFactory _examples = new();
-    private readonly ProgramWriter _programWriter = new();
+    private readonly TextProgramExporter _textExporter = new();
     private readonly ExerciseLoader _exerciseLoader = new();
     private readonly ExerciseChecker _exerciseChecker = new();
     private readonly GridDrawable _drawable = new();
-    private readonly List<IProgramExporter> _exporters = [new ProgramWriter(), new JsonProgramExporter()];
+    private readonly List<IProgramExporter> _exporters = [new TextProgramExporter(), new JsonProgramExporter()];
     private readonly IReadOnlyList<GridProgram> _examplePrograms;
 
     public MainPage()
@@ -175,7 +175,7 @@ public partial class MainPage : ContentPage
         try
         {
             var exercise = _exerciseLoader.Load(file.FullPath);
-            var grid = _gridParser.Parse(exercise.GridText);
+            var grid = exercise.Grid;
 
             GridEditor.Text = exercise.GridText;
             ExerciseDescriptionLabel.Text = exercise.Description;
@@ -184,7 +184,7 @@ public partial class MainPage : ContentPage
             _drawable.Update(grid, [grid.StartPosition], Direction.East);
             GridView.Invalidate();
 
-            ShowStatus($"Oefening '{exercise.Name}' geladen. Schrijf een programma dat de x bereikt.",
+            ShowStatus($"Oefening '{exercise.Name}' geladen. Schrijf een programma dat Juba naar de x brengt.",
                 NeutralColor);
         }
         catch (FormatException ex)
@@ -239,7 +239,7 @@ public partial class MainPage : ContentPage
            
             OutputEditor.Text = FormatTrace(ex.Trace) + $"Gestopt op ({character.X},{character.Y}): {ex.Message}";
             _drawable.Update(grid, ex.Path, character.Direction);
-            ShowStatus($"Runtime error: {ex.Message}", ErrorColor);
+            ShowStatus($"Runtime error: {ex.Message}{NoGridHint(ex, grid)}", ErrorColor);
         }
 
         GridView.Invalidate();
@@ -254,14 +254,20 @@ public partial class MainPage : ContentPage
         }
         else if (_exerciseChecker.ReachedExit(grid, result))
         {
-            ShowStatus("Gelukt! Het karakter heeft de x bereikt.", SuccessColor);
+            ShowStatus("Gelukt! Juba heeft de x bereikt.", SuccessColor);
         }
         else
         {
-            ShowStatus($"Niet gelukt: het karakter eindigt op ({result.FinalX},{result.FinalY}), " +
+            ShowStatus($"Niet gelukt: Juba eindigt op ({result.FinalX},{result.FinalY}), " +
                        $"de x staat op ({exit.X},{exit.Y}).", FailureColor);
         }
     }
+
+    //without grid the conditions of RepeatUntil are never true (see the assignment), so the loop only stops at the step limit
+    private static string NoGridHint(ProgramRuntimeException error, DomainGrid? grid) =>
+        error is ExecutionLimitException && grid is null
+            ? " RepeatUntil heeft een grid nodig: zonder grid is de voorwaarde nooit waar. Laad eerst een oefening."
+            : string.Empty;
 
     //parses the program editor
     private bool TryParseProgram(string name, out GridProgram program)
@@ -281,7 +287,7 @@ public partial class MainPage : ContentPage
 
     private void LoadIntoEditor(GridProgram program)
     {
-        ProgramEditor.Text = _programWriter.ToText(program);
+        ProgramEditor.Text = _textExporter.ToText(program);
         ShowStatus($"Programma '{program.Name}' geladen. Druk op Uitvoeren.", NeutralColor);
     }
 

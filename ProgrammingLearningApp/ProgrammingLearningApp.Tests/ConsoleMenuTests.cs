@@ -152,4 +152,22 @@ public class ConsoleMenuTests
             File.Delete(path);
         }
     }
+
+    //a RepeatUntil without grid never stops by itself, the step limit stops it and the menu shows the error
+    [Fact]
+    public void RuntimeError_IsShownAndTheMenuKeepsRunning()
+    {
+        var path = WriteTempFile("RepeatUntil WallAhead\n    Turn left");
+        try
+        {
+            var output = Run($"4\n{path}\n1\n0\n0\n");
+
+            Assert.Contains("Runtime error:", output);
+            Assert.Contains("Goodbye!", output);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
 }

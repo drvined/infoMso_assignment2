@@ -3,8 +3,9 @@ using ProgrammingLearningApp.Execution;
 
 namespace ProgrammingLearningApp.Export;
 
-//turns execution result into json and can save .json file
-public sealed class JsonExporter
+//exports the result of a run (trace, end state and path) as json and can save it as a .json file
+//not to be confused with JsonProgramExporter, which exports the program itself
+public sealed class JsonResultExporter
 {
     private static readonly JsonSerializerOptions Options = new()
     {

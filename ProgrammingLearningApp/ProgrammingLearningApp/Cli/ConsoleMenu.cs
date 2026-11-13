@@ -49,7 +49,7 @@ public sealed class ConsoleMenu
 
     public void Run()
     {
-        _output.WriteLine("=== Programming Learning App ===");
+        _output.WriteLine("=== Wakkaman ===");
 
         while (true)
         {
@@ -123,7 +123,7 @@ public sealed class ConsoleMenu
                 case "0":
                     return true;
                 case "1":
-                    _output.WriteLine(_executor.Execute(program));
+                    ExecuteAndShow(program);
                     break;
                 case "2":
                     WriteMetrics(_metrics.Calculate(program));
@@ -132,6 +132,19 @@ public sealed class ConsoleMenu
                     _output.WriteLine("Invalid choice, please enter one of the numbers above.");
                     break;
             }
+        }
+    }
+
+    //a runtime error (for example a RepeatUntil without grid that hits the step limit) is shown instead of crashing the menu
+    private void ExecuteAndShow(GridProgram program)
+    {
+        try
+        {
+            _output.WriteLine(_executor.Execute(program));
+        }
+        catch (ProgramRuntimeException e)
+        {
+            _output.WriteLine($"Runtime error: {e.Message}");
         }
     }
 

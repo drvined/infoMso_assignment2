@@ -4,6 +4,8 @@
 //without grid there are no walls, so answer is false
 public sealed class WallAheadCondition : Condition
 {
+    public override string Name => "WallAhead";
+
     public override bool IsTrue(ExecutionState state)
     {
         ArgumentNullException.ThrowIfNull(state);

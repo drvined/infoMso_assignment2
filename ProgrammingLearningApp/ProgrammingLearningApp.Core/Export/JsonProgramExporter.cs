@@ -35,7 +35,7 @@ public sealed class JsonProgramExporter : IProgramExporter
                 RepeatUntil until => new
                 {
                     type = "RepeatUntil",
-                    condition = ProgramWriter.ConditionName(until.Condition),
+                    condition = until.Condition.Name,
                     commands = ToJson(until.Commands)
                 },
                 _ => throw new NotSupportedException($"Cannot write a command of type {command.GetType().Name}.")

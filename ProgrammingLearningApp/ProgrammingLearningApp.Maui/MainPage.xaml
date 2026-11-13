@@ -4,7 +4,7 @@
              x:Class="ProgrammingLearningApp.Maui.MainPage"
              Shell.NavBarIsVisible="False"
              BackgroundColor="#16161A"
-             Title="Programming Learning App">
+             Title="Wakkaman">
 
     <ContentPage.Resources>
         <Style x:Key="Card" TargetType="Border">
@@ -50,8 +50,8 @@
     <Grid ColumnDefinitions="460,*" RowDefinitions="Auto,*" ColumnSpacing="20" RowSpacing="16" Padding="24">
 
         <VerticalStackLayout Grid.ColumnSpan="2" Spacing="2">
-            <Label Text="Programming Learning App" FontSize="24" FontAttributes="Bold" TextColor="#ECECF1" />
-            <Label Text="Schrijf een programma, voer het uit en bekijk het pad."
+            <Label Text="Wakkaman" FontSize="24" FontAttributes="Bold" TextColor="#ECECF1" />
+            <Label Text="Schrijf een programma voor Juba, voer het uit en bekijk welk pad Juba loopt."
                    Style="{StaticResource Hint}" FontSize="13" />
         </VerticalStackLayout>
 

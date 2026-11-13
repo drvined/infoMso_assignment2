@@ -11,9 +11,8 @@ public class FindExitExamplesTests
         new ExampleProgramFactory().GetAll().Single(p => p.Name == name);
 
     [Theory]
-    [InlineData("FindExit1", 4, 2, 2)]
-    [InlineData("FindExit2", 4, 2, 2)]
-    [InlineData("FindExit3", 3, 1, 1)]
+    [InlineData("FindExit1", 8, 2, 4)]
+    [InlineData("FindExit2", 3, 1, 1)]
     public void FindExitExample_HasExpectedMetrics(string name, int commands, int maxNesting, int repeats)
     {
         var metrics = new MetricsCalculator().Calculate(Find(name));

@@ -2,8 +2,9 @@
 
 namespace ProgrammingLearningApp.Export;
 
-//turns execution result into text and can save as  .txt file
-public sealed class TextExporter
+//exports the result of a run (trace and end state) as text and can save it as a .txt file
+//not to be confused with TextProgramExporter, which exports the program itself
+public sealed class TextResultExporter
 {
     public string ToText(ExecutionResult result)
     {
