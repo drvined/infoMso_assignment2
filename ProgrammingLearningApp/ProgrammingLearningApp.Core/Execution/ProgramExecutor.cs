@@ -26,9 +26,18 @@ public sealed class ProgramExecutor : IProgramRunner
     {
         ArgumentNullException.ThrowIfNull(program);
 
-        foreach (var command in program.Commands)
+        try
         {
-            command.Execute(state);
+            foreach (var command in program.Commands)
+            {
+                command.Execute(state);
+            }
+        }
+        catch (ProgramRuntimeException ex)
+        {
+            //keeps the path walked so far, so the UI can still draw where the character went
+            ex.Path = state.Path.ToList();
+            throw;
         }
 
         var character = state.Character;
