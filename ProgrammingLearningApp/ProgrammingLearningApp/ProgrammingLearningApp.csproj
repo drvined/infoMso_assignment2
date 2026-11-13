@@ -11,9 +11,4 @@
     <ProjectReference Include="..\ProgrammingLearningApp.Core\ProgrammingLearningApp.Core.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Domain\" />
-    <Folder Include="Parsing\" />
-  </ItemGroup>
-
 </Project>
