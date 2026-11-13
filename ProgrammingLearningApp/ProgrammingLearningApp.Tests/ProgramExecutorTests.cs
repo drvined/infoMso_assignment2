@@ -67,4 +67,32 @@ public class ProgramExecutorTests
 
         Assert.Equal(Direction.North, result.FinalDirection);
     }
+
+    [Fact]
+    public void Move_PathContainsStartAndEveryStep()
+    {
+        ExecutionResult result = Run("Move 3");
+
+        Assert.Equal(
+            new Position[] { new(0, 0), new(1, 0), new(2, 0), new(3, 0) },
+            result.Path);
+    }
+
+    [Fact]
+    public void Turn_DoesNotAddToPath()
+    {
+        ExecutionResult result = Run("Turn right");
+
+        Assert.Equal(new Position[] { new(0, 0) }, result.Path);
+    }
+
+    [Fact]
+    public void MoveTurnMove_PathFollowsTheTurn()
+    {
+        ExecutionResult result = Run("Move 1\nTurn right\nMove 2");
+
+        Assert.Equal(
+            new Position[] { new(0, 0), new(1, 0), new(1, 1), new(1, 2) },
+            result.Path);
+    }
 }

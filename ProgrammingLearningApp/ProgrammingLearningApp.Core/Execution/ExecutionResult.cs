@@ -1,14 +1,18 @@
-using ProgrammingLearningApp.Domain;
+﻿using ProgrammingLearningApp.Domain;
 
 namespace ProgrammingLearningApp.Execution;
 
-//what you get after running a program: the trace of all commands that were done
-//and the end state of the character
+//what you get after running a program: the trace of all commands that were done,
+//the path the character walked (for drawing) and the end state of the character
 public sealed class ExecutionResult
 {
     private readonly List<string> _trace;
+    private readonly List<Position> _path;
 
     public IReadOnlyList<string> Trace => _trace;
+
+    //every cell the character was on, in order, starting with the start cell
+    public IReadOnlyList<Position> Path => _path;
 
     public int FinalX { get; }
 
@@ -16,11 +20,14 @@ public sealed class ExecutionResult
 
     public Direction FinalDirection { get; }
 
-    public ExecutionResult(IEnumerable<string> trace, int finalX, int finalY, Direction finalDirection)
+    public ExecutionResult(IEnumerable<string> trace, IEnumerable<Position> path,
+        int finalX, int finalY, Direction finalDirection)
     {
         ArgumentNullException.ThrowIfNull(trace);
+        ArgumentNullException.ThrowIfNull(path);
 
         _trace = trace.ToList();
+        _path = path.ToList();
         FinalX = finalX;
         FinalY = finalY;
         FinalDirection = finalDirection;

@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ProgrammingLearningApp\ProgrammingLearningApp.csproj" />
+    <ProjectReference Include="..\ProgrammingLearningApp.Core\ProgrammingLearningApp.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
