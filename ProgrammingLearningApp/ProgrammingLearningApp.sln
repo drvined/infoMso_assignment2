@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgrammingLearningApp.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgrammingLearningApp.Core", "ProgrammingLearningApp.Core\ProgrammingLearningApp.Core.csproj", "{0AA84CD8-B058-41B5-82F4-F99AE1134E7B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProgrammingLearningApp.Maui", "ProgrammingLearningApp.Maui\ProgrammingLearningApp.Maui.csproj", "{3B6D37D9-83F3-45E5-98EB-CC22CD493ADA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{0AA84CD8-B058-41B5-82F4-F99AE1134E7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0AA84CD8-B058-41B5-82F4-F99AE1134E7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0AA84CD8-B058-41B5-82F4-F99AE1134E7B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B6D37D9-83F3-45E5-98EB-CC22CD493ADA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B6D37D9-83F3-45E5-98EB-CC22CD493ADA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B6D37D9-83F3-45E5-98EB-CC22CD493ADA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B6D37D9-83F3-45E5-98EB-CC22CD493ADA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

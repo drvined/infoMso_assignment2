@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ProgrammingLearningApp.Maui.MainPage"
+             Title="Programming Learning App">
+
+    <VerticalStackLayout Padding="20" Spacing="12">
+        <Label Text="Programma" FontSize="18" />
+        <Editor x:Name="ProgramEditor" HeightRequest="150"
+                Placeholder="Bijvoorbeeld: Move, Turn, Repeat" />
+
+        <Label Text="Grid" FontSize="18" />
+        <Editor x:Name="GridEditor" HeightRequest="150"
+                Placeholder="Gebruik o, +, x en s" />
+
+        <Button Text="Uitvoeren" Clicked="OnRunClicked" />
+        <Label x:Name="ResultLabel" />
+    </VerticalStackLayout>
+</ContentPage>
