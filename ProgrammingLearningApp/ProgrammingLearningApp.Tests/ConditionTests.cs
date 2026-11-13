@@ -60,4 +60,12 @@ public class ConditionTests
 
         Assert.False(new GridEdgeCondition().IsTrue(state));
     }
+
+    //the name is what the exporters write, so it has to match the program text format
+    [Fact]
+    public void Conditions_HaveTheNameUsedInProgramText()
+    {
+        Assert.Equal("WallAhead", new WallAheadCondition().Name);
+        Assert.Equal("GridEdge", new GridEdgeCondition().Name);
+    }
 }

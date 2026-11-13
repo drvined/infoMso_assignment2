@@ -157,7 +157,7 @@ public sealed class GridDrawable : IDrawable
     {
         canvas.FontColor = HintColor;
         canvas.FontSize = 14;
-        canvas.DrawString("Voer een programma uit of laad een oefening.", dirtyRect,
+        canvas.DrawString("Voer een programma uit of laad een oefening om Juba te laten lopen.", dirtyRect,
             Microsoft.Maui.Graphics.HorizontalAlignment.Center,
             Microsoft.Maui.Graphics.VerticalAlignment.Center);
     }

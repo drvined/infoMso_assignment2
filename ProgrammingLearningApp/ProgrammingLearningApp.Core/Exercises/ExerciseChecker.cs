@@ -1,13 +1,11 @@
 using ProgrammingLearningApp.Domain;
 using ProgrammingLearningApp.Execution;
-using ProgrammingLearningApp.Parsing;
 
 namespace ProgrammingLearningApp.Exercises;
 
 //checks ig program brings the character from the start cell to the exit cell
 public sealed class ExerciseChecker
 {
-    private readonly GridParser _gridParser = new();
     private readonly IProgramRunner _runner;
 
     public ExerciseChecker(IProgramRunner? runner = null)
@@ -20,7 +18,7 @@ public sealed class ExerciseChecker
         ArgumentNullException.ThrowIfNull(program);
         ArgumentNullException.ThrowIfNull(exercise);
 
-        var grid = _gridParser.Parse(exercise.GridText);
+        var grid = exercise.Grid;
         var start = grid.StartPosition;
 
         try

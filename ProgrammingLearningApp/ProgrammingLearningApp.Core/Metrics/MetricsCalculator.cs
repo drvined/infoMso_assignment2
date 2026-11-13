@@ -2,7 +2,8 @@ using ProgrammingLearningApp.Domain;
 
 namespace ProgrammingLearningApp.Metrics;
 
-//calculates the metrics number of commands, max nesting and number of repeats a repeat and a repeat until both count as a repeat
+//calculates the metrics number of commands, max nesting and number of repeats
+//every LoopCommand (Repeat and RepeatUntil) counts as a repeat, so a new kind of loop is counted without changing this class
 public sealed class MetricsCalculator
 {
     public ProgramMetrics Calculate(GridProgram program)
@@ -20,17 +21,10 @@ public sealed class MetricsCalculator
             counter.Commands++;
             counter.MaxNesting = Math.Max(counter.MaxNesting, nestingLevel);
 
-            switch (command)
+            if (command is LoopCommand loop)
             {
-                case Repeat repeat:
-                    counter.Repeats++;
-                    CountCommands(repeat.Commands, nestingLevel + 1, counter);
-                    break;
-
-                case RepeatUntil repeatUntil:
-                    counter.Repeats++;
-                    CountCommands(repeatUntil.Commands, nestingLevel + 1, counter);
-                    break;
+                counter.Repeats++;
+                CountCommands(loop.Commands, nestingLevel + 1, counter);
             }
         }
     }

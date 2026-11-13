@@ -2,18 +2,13 @@
 
 //the repeat until command runs its commands again and again until the condition is true
 //the condition is checked before every round, so when it is already true the commands never run
-public sealed class RepeatUntil : Command
+public sealed class RepeatUntil : LoopCommand
 {
-    private readonly List<Command> _commands;
-
     public Condition Condition { get; }
 
-    public IReadOnlyList<Command> Commands => _commands;
-
-    public RepeatUntil(Condition condition, IEnumerable<Command> commands)
+    public RepeatUntil(Condition condition, IEnumerable<Command> commands) : base(commands)
     {
         Condition = condition ?? throw new ArgumentNullException(nameof(condition));
-        _commands = commands.ToList();
     }
 
     public override void Execute(ExecutionState state)
@@ -23,11 +18,7 @@ public sealed class RepeatUntil : Command
         while (!Condition.IsTrue(state))
         {
             state.CountStep();
-
-            foreach (var command in _commands)
-            {
-                command.Execute(state);
-            }
+            ExecuteBody(state);
         }
     }
 }

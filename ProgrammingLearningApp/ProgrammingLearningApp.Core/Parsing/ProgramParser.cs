@@ -107,46 +107,70 @@ public sealed class ProgramParser
         return commands;
     }
 
+    //picks the method for the keyword at the start of the line, each command is parsed in its own method
     private static Command ParseCommand(SourceLine line, List<SourceLine> lines, ref int index)
     {
         var parts = line.Content.Split(' ');
 
         switch (parts[0])
         {
-            case "Move" when parts.Length == 2:
-                return new Move(ParseCount(line, parts[1]));
-
             case "Move":
-                throw Error(line, "Expected 'Move [x]', for example 'Move 10'.");
-
-            case "Turn" when parts.Length == 2 && parts[1] == "left":
-                return new Turn(TurnSide.Left);
-
-            case "Turn" when parts.Length == 2 && parts[1] == "right":
-                return new Turn(TurnSide.Right);
+                return ParseMove(line, parts);
 
             case "Turn":
-                throw Error(line, "Expected 'Turn left' or 'Turn right'.");
-
-            case "Repeat" when parts.Length == 2 || (parts.Length == 3 && parts[2] == "times"):
-                return new Repeat(ParseCount(line, parts[1]), ParseBody(line, lines, ref index));
-
-            case "RepeatUntil" when parts.Length == 2:
-                return new RepeatUntil(ParseCondition(line, parts[1]), ParseBody(line, lines, ref index));
-
-            case "Repeat" when parts.Length == 3 && parts[1] == "until":
-                return new RepeatUntil(ParseCondition(line, parts[2]), ParseBody(line, lines, ref index));
+                return ParseTurn(line, parts);
 
             case "Repeat":
-                throw Error(line, "Expected 'Repeat [x]', for example 'Repeat 4'.");
+                return ParseRepeat(line, parts, lines, ref index);
 
             case "RepeatUntil":
-                throw Error(line, "Expected 'RepeatUntil [condition]', for example 'RepeatUntil WallAhead'.");
+                return ParseRepeatUntil(line, parts, lines, ref index);
 
             default:
                 throw Error(line,
                     $"Unknown command '{parts[0]}'. Valid commands are Move, Turn, Repeat and RepeatUntil.");
         }
+    }
+
+    //Move [x]
+    private static Move ParseMove(SourceLine line, string[] parts) =>
+        parts.Length == 2
+            ? new Move(ParseCount(line, parts[1]))
+            : throw Error(line, "Expected 'Move [x]', for example 'Move 10'.");
+
+    //Turn left or Turn right
+    private static Turn ParseTurn(SourceLine line, string[] parts) => parts switch
+    {
+        [_, "left"] => new Turn(TurnSide.Left),
+        [_, "right"] => new Turn(TurnSide.Right),
+        _ => throw Error(line, "Expected 'Turn left' or 'Turn right'.")
+    };
+
+    //Repeat [x] or Repeat [x] times, and Repeat until [condition] as another way to write RepeatUntil
+    private static Command ParseRepeat(SourceLine line, string[] parts, List<SourceLine> lines, ref int index)
+    {
+        if (parts.Length == 2 || (parts.Length == 3 && parts[2] == "times"))
+        {
+            return new Repeat(ParseCount(line, parts[1]), ParseBody(line, lines, ref index));
+        }
+
+        if (parts.Length == 3 && parts[1] == "until")
+        {
+            return new RepeatUntil(ParseCondition(line, parts[2]), ParseBody(line, lines, ref index));
+        }
+
+        throw Error(line, "Expected 'Repeat [x]', for example 'Repeat 4'.");
+    }
+
+    //RepeatUntil [condition]
+    private static RepeatUntil ParseRepeatUntil(SourceLine line, string[] parts, List<SourceLine> lines, ref int index)
+    {
+        if (parts.Length != 2)
+        {
+            throw Error(line, "Expected 'RepeatUntil [condition]', for example 'RepeatUntil WallAhead'.");
+        }
+
+        return new RepeatUntil(ParseCondition(line, parts[1]), ParseBody(line, lines, ref index));
     }
 
     private static List<Command> ParseBody(SourceLine line, List<SourceLine> lines, ref int index)

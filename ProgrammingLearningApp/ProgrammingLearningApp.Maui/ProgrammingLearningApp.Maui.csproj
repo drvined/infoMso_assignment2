@@ -12,9 +12,9 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
-		<ApplicationTitle>ProgrammingLearningApp.Maui</ApplicationTitle>
+		<ApplicationTitle>Wakkaman</ApplicationTitle>
 		
-		<ApplicationId>com.companyname.programminglearningapp.maui</ApplicationId>
+		<ApplicationId>com.wakkaman.app</ApplicationId>
 
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>

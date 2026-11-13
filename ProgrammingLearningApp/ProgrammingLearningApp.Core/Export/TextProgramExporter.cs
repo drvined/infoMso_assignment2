@@ -2,8 +2,8 @@ using ProgrammingLearningApp.Domain;
 
 namespace ProgrammingLearningApp.Export;
 
-//writes program back to the text format
-public sealed class ProgramWriter : IProgramExporter
+//exports a program in the text format, the same format the parser reads (so export and import match)
+public sealed class TextProgramExporter : IProgramExporter
 {
     private const string Indent = "    ";
 
@@ -22,13 +22,6 @@ public sealed class ProgramWriter : IProgramExporter
 
         return string.Join(Environment.NewLine, lines) + Environment.NewLine;
     }
-
-    internal static string ConditionName(Condition condition) => condition switch
-    {
-        WallAheadCondition => "WallAhead",
-        GridEdgeCondition => "GridEdge",
-        _ => throw new NotSupportedException($"Cannot write a condition of type {condition.GetType().Name}.")
-    };
 
     private static void WriteCommands(IEnumerable<Command> commands, int level, List<string> lines)
     {
@@ -52,7 +45,7 @@ public sealed class ProgramWriter : IProgramExporter
                     break;
 
                 case RepeatUntil repeatUntil:
-                    lines.Add($"{indent}Repeat until {ConditionName(repeatUntil.Condition)}");
+                    lines.Add($"{indent}RepeatUntil {repeatUntil.Condition.Name}");
                     WriteCommands(repeatUntil.Commands, level + 1, lines);
                     break;
 

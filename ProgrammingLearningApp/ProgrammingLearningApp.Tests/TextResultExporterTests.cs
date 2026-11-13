@@ -5,7 +5,7 @@ using Xunit;
 
 namespace ProgrammingLearningApp.Tests;
 
-public class TextExporterTests
+public class TextResultExporterTests
 {
     [Fact]
     public void ToText_ContainsTraceAndEndState()
@@ -13,7 +13,7 @@ public class TextExporterTests
         var program = new ProgramParser().Parse("test", "Move 2");
         var result = new ProgramExecutor().Execute(program);
 
-        var text = new TextExporter().ToText(result);
+        var text = new TextResultExporter().ToText(result);
 
         Assert.Contains("Move 2.", text);
         Assert.Contains("End state (2,0) facing east.", text);
@@ -28,9 +28,9 @@ public class TextExporterTests
 
         try
         {
-            new TextExporter().Save(result, path);
+            new TextResultExporter().Save(result, path);
 
-            Assert.Equal(new TextExporter().ToText(result), File.ReadAllText(path));
+            Assert.Equal(new TextResultExporter().ToText(result), File.ReadAllText(path));
         }
         finally
         {

@@ -6,7 +6,7 @@ using Xunit;
 
 namespace ProgrammingLearningApp.Tests;
 
-public class JsonExporterTests
+public class JsonResultExporterTests
 {
     [Fact]
     public void ToJson_ContainsTraceEndStateAndPath()
@@ -14,7 +14,7 @@ public class JsonExporterTests
         var program = new ProgramParser().Parse("test", "Move 2");
         var result = new ProgramExecutor().Execute(program);
 
-        using var document = JsonDocument.Parse(new JsonExporter().ToJson(result));
+        using var document = JsonDocument.Parse(new JsonResultExporter().ToJson(result));
         var root = document.RootElement;
 
         Assert.Equal("Move 2", root.GetProperty("trace")[0].GetString());
@@ -36,9 +36,9 @@ public class JsonExporterTests
 
         try
         {
-            new JsonExporter().Save(result, path);
+            new JsonResultExporter().Save(result, path);
 
-            Assert.Equal(new JsonExporter().ToJson(result), File.ReadAllText(path));
+            Assert.Equal(new JsonResultExporter().ToJson(result), File.ReadAllText(path));
         }
         finally
         {
