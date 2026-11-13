@@ -23,13 +23,6 @@ public sealed class ProgramWriter : IProgramExporter
         return string.Join(Environment.NewLine, lines) + Environment.NewLine;
     }
 
-    internal static string ConditionName(Condition condition) => condition switch
-    {
-        WallAheadCondition => "WallAhead",
-        GridEdgeCondition => "GridEdge",
-        _ => throw new NotSupportedException($"Cannot write a condition of type {condition.GetType().Name}.")
-    };
-
     private static void WriteCommands(IEnumerable<Command> commands, int level, List<string> lines)
     {
         var indent = string.Concat(Enumerable.Repeat(Indent, level));
@@ -52,7 +45,7 @@ public sealed class ProgramWriter : IProgramExporter
                     break;
 
                 case RepeatUntil repeatUntil:
-                    lines.Add($"{indent}Repeat until {ConditionName(repeatUntil.Condition)}");
+                    lines.Add($"{indent}Repeat until {repeatUntil.Condition.Name}");
                     WriteCommands(repeatUntil.Commands, level + 1, lines);
                     break;
 

@@ -94,13 +94,14 @@ public class ExampleProgramFactoryTests
     }
 
     [Fact]
-    public void Rectangle1AndRectangle2_GiveTheSameTrace()
+    public void Rectangle1AndRectangle2_WalkTheSamePath()
     {
         var executor = new ProgramExecutor();
+        var rectangle1 = executor.Execute(Find("Rectangle1"));
+        var rectangle2 = executor.Execute(Find("Rectangle2"));
 
-        Assert.Equal(
-            executor.Execute(Find("Rectangle1")).FormatTrace(),
-            executor.Execute(Find("Rectangle2")).FormatTrace());
+        Assert.Equal(rectangle1.Path, rectangle2.Path);
+        Assert.Equal(rectangle1.FormatEndState(), rectangle2.FormatEndState());
     }
 
     [Theory]

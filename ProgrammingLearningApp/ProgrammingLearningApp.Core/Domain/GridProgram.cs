@@ -13,6 +13,9 @@ public sealed class GridProgram
     //makes a copy of the commands so changing the original list later doesnt change the program
     public GridProgram(string name, IEnumerable<Command> commands)
     {
+        ArgumentNullException.ThrowIfNull(name);
+        ArgumentNullException.ThrowIfNull(commands);
+
         Name = name;
         _commands = commands.ToList();
     }

@@ -49,7 +49,7 @@ public sealed class ConsoleMenu
 
     public void Run()
     {
-        _output.WriteLine("=== Programming Learning App ===");
+        _output.WriteLine("=== dumbydumb ===");
 
         while (true)
         {

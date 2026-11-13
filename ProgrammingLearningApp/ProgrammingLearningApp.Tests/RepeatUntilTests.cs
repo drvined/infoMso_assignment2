@@ -22,6 +22,19 @@ public class RepeatUntilTests
     }
 
     [Fact]
+    public void RepeatUntil_AddsItselfToTheTraceOnce()
+    {
+        var cells = new CellType[3, 2];
+        cells[2, 0] = CellType.Blocked;
+        var state = new ExecutionState(new Character(0, 0, Direction.East), new Grid(cells));
+        var loop = new RepeatUntil(new WallAheadCondition(), new List<Command> { new Move(1) });
+
+        loop.Execute(state);
+
+        Assert.Equal(new[] { "RepeatUntil WallAhead", "Move 1" }, state.Trace);
+    }
+
+    [Fact]
     public void RepeatUntil_WithConditionThatNeverBecomesTrue_IsStoppedByStepLimit()
     {
         var state = new ExecutionState(new Character(0, 0, Direction.East), null, maxSteps: 5);

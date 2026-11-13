@@ -1,4 +1,4 @@
-namespace ProgrammingLearningApp.Exercises;
+namespace ProgrammingLearningApp.IO;
 
 public sealed class FileSystemFileReader : IFileReader
 {

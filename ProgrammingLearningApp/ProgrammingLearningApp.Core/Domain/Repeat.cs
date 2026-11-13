@@ -17,6 +17,8 @@ public sealed class Repeat : Command
             throw new ArgumentOutOfRangeException(nameof(times), "A repeat must run zero or more times.");
         }
 
+        ArgumentNullException.ThrowIfNull(commands);
+
         Times = times;
         _commands = commands.ToList();
     }
@@ -25,6 +27,8 @@ public sealed class Repeat : Command
     public override void Execute(ExecutionState state)
     {
         ArgumentNullException.ThrowIfNull(state);
+
+        state.AddToTrace($"Repeat {Times}");
 
         for (var i = 0; i < Times; i++)
         {

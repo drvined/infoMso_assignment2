@@ -1,4 +1,4 @@
-using ProgrammingLearningApp.Exercises;
+using ProgrammingLearningApp.IO;
 
 namespace ProgrammingLearningApp.Tests;
 

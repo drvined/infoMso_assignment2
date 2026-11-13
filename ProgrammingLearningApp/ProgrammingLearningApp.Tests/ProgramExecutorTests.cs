@@ -26,7 +26,7 @@ public class ProgramExecutorTests
         ExecutionResult result = Run(TestPrograms.Example2);
 
         Assert.Equal(
-            "Move 10, Turn right, Move 10, Turn right, Move 10, Turn right, Move 10, Turn right.",
+            "Repeat 4, Move 10, Turn right, Move 10, Turn right, Move 10, Turn right, Move 10, Turn right.",
             result.FormatTrace());
         Assert.Equal("End state (0,0) facing east.", result.FormatEndState());
     }

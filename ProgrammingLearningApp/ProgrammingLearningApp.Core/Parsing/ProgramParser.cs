@@ -1,5 +1,6 @@
 using System.Globalization;
 using ProgrammingLearningApp.Domain;
+using ProgrammingLearningApp.IO;
 
 namespace ProgrammingLearningApp.Parsing;
 
@@ -7,20 +8,27 @@ public sealed class ProgramParser
 {
     private const int IndentSize = 4;
 
+    private readonly IFileReader _fileReader;
+
     private sealed record SourceLine(int Number, int Level, string Content);
+
+    public ProgramParser(IFileReader? fileReader = null)
+    {
+        _fileReader = fileReader ?? new FileSystemFileReader();
+    }
 
     //reads and parses program file
     public GridProgram ParseFile(string path)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(path);
 
-        if (!File.Exists(path))
+        if (!_fileReader.Exists(path))
         {
             throw new FileNotFoundException($"Program file not found: {path}", path);
         }
 
         var name = Path.GetFileNameWithoutExtension(path);
-        return Parse(name, File.ReadAllText(path));
+        return Parse(name, _fileReader.ReadAllText(path));
     }
 
     //parses program text into program with the given name

@@ -46,6 +46,17 @@ public class RepeatUntilParserTests
         Assert.All(program.Commands, command => Assert.IsType<Repeat>(command));
     }
 
+    [Theory]
+    [InlineData("WallAhead")]
+    [InlineData("GridEdge")]
+    public void ParsedCondition_HasTheNameItWasWrittenWith(string conditionName)
+    {
+        var program = new ProgramParser().Parse("test", $"RepeatUntil {conditionName}\n    Move 1");
+
+        var repeatUntil = Assert.IsType<RepeatUntil>(Assert.Single(program.Commands));
+        Assert.Equal(conditionName, repeatUntil.Condition.Name);
+    }
+
     [Fact]
     public void Parse_UnknownCondition_ThrowsFormatException()
     {

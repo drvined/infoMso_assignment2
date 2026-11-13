@@ -12,6 +12,8 @@ public sealed class RepeatUntil : Command
 
     public RepeatUntil(Condition condition, IEnumerable<Command> commands)
     {
+        ArgumentNullException.ThrowIfNull(commands);
+
         Condition = condition ?? throw new ArgumentNullException(nameof(condition));
         _commands = commands.ToList();
     }
@@ -19,6 +21,8 @@ public sealed class RepeatUntil : Command
     public override void Execute(ExecutionState state)
     {
         ArgumentNullException.ThrowIfNull(state);
+
+        state.AddToTrace($"RepeatUntil {Condition.Name}");
 
         while (!Condition.IsTrue(state))
         {

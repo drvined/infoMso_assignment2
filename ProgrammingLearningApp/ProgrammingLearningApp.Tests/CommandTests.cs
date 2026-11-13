@@ -59,7 +59,8 @@ public class CommandTests
 
         new Repeat(3, [new Move(1), new Turn(TurnSide.Right)]).Execute(state);
 
-        Assert.Equal(6, state.Trace.Count);
+        Assert.Equal(7, state.Trace.Count);
+        Assert.Equal("Repeat 3", state.Trace[0]);
         Assert.Equal(4, state.Path.Count);
     }
 
@@ -70,7 +71,7 @@ public class CommandTests
 
         new Repeat(0, [new Move(5)]).Execute(state);
 
-        Assert.Empty(state.Trace);
+        Assert.Equal(new[] { "Repeat 0" }, state.Trace);
         Assert.Equal(new Position(0, 0), state.Character.Position);
     }
 }

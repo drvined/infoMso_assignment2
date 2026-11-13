@@ -7,6 +7,8 @@ public sealed class MetricsCalculator
 {
     public ProgramMetrics Calculate(GridProgram program)
     {
+        ArgumentNullException.ThrowIfNull(program);
+
         var counter = new Counter();
         CountCommands(program.Commands, nestingLevel: 0, counter);
 

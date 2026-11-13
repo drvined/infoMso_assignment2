@@ -52,6 +52,25 @@ public class ProgramParserFileTests
     }
 
     [Fact]
+    public void ParseFile_WithFakeReader_ReadsFromTheReader()
+    {
+        var reader = new FakeFileReader(new() { ["programmas/Vierkant.txt"] = TestPrograms.Example2 });
+
+        GridProgram program = new ProgramParser(reader).ParseFile("programmas/Vierkant.txt");
+
+        Assert.Equal("Vierkant", program.Name);
+        Assert.IsType<Repeat>(Assert.Single(program.Commands));
+    }
+
+    [Fact]
+    public void ParseFile_WithFakeReaderAndNoFile_Throws()
+    {
+        var reader = new FakeFileReader(new());
+
+        Assert.Throws<FileNotFoundException>(() => new ProgramParser(reader).ParseFile("programmas/bestaat_niet.txt"));
+    }
+
+    [Fact]
     public void ParseFile_MissingFile_Throws()
     {
         Assert.Throws<FileNotFoundException>(() =>
