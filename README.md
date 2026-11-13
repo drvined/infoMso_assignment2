@@ -10,6 +10,11 @@ lab assignment 2.
 in step 1 you pick a example basic, advanced or expert or import a .txt file with a program. 
 you can execute it or calculate the metrics in step 2.
 
+# project structure
+- ProgrammingLearningApp.Core: all domain logic (commands, parser, executor, metrics, examples). no UI code.
+- ProgrammingLearningApp: the console app, only input/output, uses Core.
+- ProgrammingLearningApp.Tests: unit tests.
+
 # how to run tests
 1. cd ProgrammingLearningApp
 2. dotnet test

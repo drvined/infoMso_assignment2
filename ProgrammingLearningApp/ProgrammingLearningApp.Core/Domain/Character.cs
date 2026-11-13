@@ -7,6 +7,8 @@ public sealed class Character
     public int Y { get; private set; }
     public Direction Direction { get; private set; }
 
+    public Position Position => new(X, Y);
+
     //new character starts at (0,0) facing east like in the assignment
     public Character() : this(0, 0, Direction.East)
     {

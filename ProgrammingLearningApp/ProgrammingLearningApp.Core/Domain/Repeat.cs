@@ -1,4 +1,6 @@
-﻿namespace ProgrammingLearningApp.Domain;
+using ProgrammingLearningApp.Execution;
+
+namespace ProgrammingLearningApp.Domain;
 
 //the repeat command: runs its list of commands a number of times
 public sealed class Repeat : Command
@@ -19,5 +21,19 @@ public sealed class Repeat : Command
 
         Times = times;
         _commands = commands.ToList();
+    }
+
+    //runs the inner commands Times times, each inner command runs itself
+    public override void Execute(ExecutionState state)
+    {
+        ArgumentNullException.ThrowIfNull(state);
+
+        for (var i = 0; i < Times; i++)
+        {
+            foreach (var command in _commands)
+            {
+                command.Execute(state);
+            }
+        }
     }
 }
