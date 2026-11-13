@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <!-- All domain logic (commands, parsing, execution, metrics, examples).
        No UI code here, so the console app, the MAUI app and the tests can all use it. -->

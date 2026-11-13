@@ -5,7 +5,7 @@ namespace ProgrammingLearningApp.Execution;
 //runs a program on a character and keeps a trace of every move and turn that happened
 //the commands run themselves (Command.Execute), the executor only sets up the state
 //and collects the result, so it doesnt change when a new command is added
-public sealed class ProgramExecutor
+public sealed class ProgramExecutor : IProgramRunner
 {
     //runs the program on a new character that starts at (0,0) facing east
     public ExecutionResult Execute(GridProgram program) => Execute(program, new Character());

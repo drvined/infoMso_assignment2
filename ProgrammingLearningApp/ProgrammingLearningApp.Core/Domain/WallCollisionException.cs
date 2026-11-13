@@ -1,4 +1,4 @@
-﻿namespace ProgrammingLearningApp.Execution;
+﻿namespace ProgrammingLearningApp.Domain;
 
 //the character tried to walk into a blocked cell
 public class WallCollisionException : ProgramRuntimeException

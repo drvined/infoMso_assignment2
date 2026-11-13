@@ -31,12 +31,8 @@ public sealed class Character
     //y goes down when going north and up when going south
     public void StepForward()
     {
-        switch (Direction)
-        {
-            case Direction.North: Y--; break;
-            case Direction.South: Y++; break;
-            case Direction.East: X++; break;
-            case Direction.West: X--; break;
-        }
+        var next = Position.Step(Direction);
+        X = next.X;
+        Y = next.Y;
     }
 }

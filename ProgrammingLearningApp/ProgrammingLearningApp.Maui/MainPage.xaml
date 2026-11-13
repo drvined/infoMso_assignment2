@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="ProgrammingLearningApp.Maui.MainPage"
+             Title="Programming Learning App">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="12">
+            <Label Text="Programma" FontSize="18" />
+            <Editor x:Name="ProgramEditor" HeightRequest="150"
+                    Placeholder="Bijvoorbeeld: Move, Turn, Repeat" />
+            <Button Text="Programma uitvoeren" Clicked="OnRunClicked" />
+            <Button Text="Bestand importeren" Clicked="OnImportClicked" />
+            <Picker x:Name="ExportFormatPicker" Title="Kies een exportformaat" />
+            <Button Text="Programma exporteren" Clicked="OnExportClicked" />
+
+            <Label Text="Voorbeeld" FontSize="18" />
+            <Picker x:Name="ExamplePicker" Title="Kies een voorbeeld" />
+            <Button Text="Voorbeeld uitvoeren" Clicked="OnRunExampleClicked" />
+            <Picker x:Name="LevelPicker" Title="Kies een niveau" />
+            <Button Text="Willekeurig programma laden" Clicked="OnLoadRandomClicked" />
+
+            <Label Text="Pathfinding-oefening" FontSize="18" />
+            <Button Text="Oefening laden uit bestand" Clicked="OnLoadExerciseClicked" />
+            <Label x:Name="ExerciseDescriptionLabel" />
+            <Button Text="Oefening controleren" Clicked="OnCheckExerciseClicked" />
+            <Label x:Name="ExerciseLabel" />
+
+            <Label Text="Grid" FontSize="18" />
+            <Editor x:Name="GridEditor" HeightRequest="150"
+                    Placeholder="Gebruik o, +, x en s" />
+
+            <Label x:Name="ResultLabel" />
+            <Label x:Name="MetricsLabel" />
+            <GraphicsView x:Name="GridView" HeightRequest="250" />
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
