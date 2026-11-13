@@ -1,10 +1,10 @@
-﻿using Microsoft.Maui.Graphics;
+using Microsoft.Maui.Graphics;
 using ProgrammingLearningApp.Domain;
 using DomainGrid = ProgrammingLearningApp.Domain.Grid;
 
 namespace ProgrammingLearningApp.Maui;
 
-//draws the grid and the path the character walked over it
+//draws the grid, the path the character walked over it and the character on its last cell
 public sealed class GridDrawable : IDrawable
 {
     private DomainGrid? _grid;
@@ -27,7 +27,14 @@ public sealed class GridDrawable : IDrawable
         var offsetX = dirtyRect.Left;
         var offsetY = dirtyRect.Top;
 
-        for (var y = 0; y < _grid.Height; y++)
+        DrawCells(canvas, cellSize, offsetX, offsetY);
+        DrawPath(canvas, cellSize, offsetX, offsetY);
+        DrawCharacter(canvas, cellSize, offsetX, offsetY);
+    }
+
+    private void DrawCells(ICanvas canvas, float cellSize, float offsetX, float offsetY)
+    {
+        for (var y = 0; y < _grid!.Height; y++)
         {
             for (var x = 0; x < _grid.Width; x++)
             {
@@ -37,10 +44,14 @@ public sealed class GridDrawable : IDrawable
                 canvas.FillColor = ColorFor(_grid.GetCell(new Position(x, y)));
                 canvas.FillRectangle(left, top, cellSize, cellSize);
                 canvas.StrokeColor = Colors.Gray;
+                canvas.StrokeSize = 1;
                 canvas.DrawRectangle(left, top, cellSize, cellSize);
             }
         }
+    }
 
+    private void DrawPath(ICanvas canvas, float cellSize, float offsetX, float offsetY)
+    {
         if (_path.Count < 2)
         {
             return;
@@ -55,6 +66,19 @@ public sealed class GridDrawable : IDrawable
             var to = Center(_path[i], cellSize, offsetX, offsetY);
             canvas.DrawLine(from.X, from.Y, to.X, to.Y);
         }
+    }
+
+    //a red dot on the cell where the character ends, or where it stopped when an error happened
+    private void DrawCharacter(ICanvas canvas, float cellSize, float offsetX, float offsetY)
+    {
+        if (_path.Count == 0)
+        {
+            return;
+        }
+
+        var position = Center(_path[^1], cellSize, offsetX, offsetY);
+        canvas.FillColor = Colors.Red;
+        canvas.FillCircle(position.X, position.Y, cellSize * 0.3f);
     }
 
     private static PointF Center(Position position, float cellSize, float offsetX, float offsetY) =>

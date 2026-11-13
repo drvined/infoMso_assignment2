@@ -202,25 +202,29 @@ public partial class MainPage : ContentPage
     }
 
     //runs a program on the grid that is typed in the grid editor and shows the result and metrics
+    //the path is drawn also when the program stops with an error, so the user sees how far the character got
     private void RunProgram(GridProgram program)
     {
+        DomainGrid? grid = null;
+        IReadOnlyList<Position> path = [];
+
         try
         {
-            var grid = _gridParser.Parse(GridEditor.Text ?? string.Empty);
+            if (string.IsNullOrWhiteSpace(GridEditor.Text))
+            {
+                ResultLabel.Text = "Vul eerst een grid in.";
+            }
+            else
+            {
+                grid = _gridParser.Parse(GridEditor.Text);
 
-            var start = FindStart(grid);
-            var character = new Character(start.X, start.Y, Direction.East);
+                var start = FindStart(grid);
+                var character = new Character(start.X, start.Y, Direction.East);
 
-            var result = _executor.Execute(program, grid, character);
-            ResultLabel.Text = result.ToString();
-
-            var metrics = _metrics.Calculate(program);
-            MetricsLabel.Text = $"Commando's: {metrics.CommandCount}, " +
-                                $"maximale nesting: {metrics.MaxNestingLevel}, " +
-                                $"herhalingen: {metrics.RepeatCount}";
-
-            _drawable.Update(grid, result.Path);
-            GridView.Invalidate();
+                var result = _executor.Execute(program, grid, character);
+                path = result.Path;
+                ResultLabel.Text = result.ToString();
+            }
         }
         catch (FormatException ex)
         {
@@ -228,8 +232,20 @@ public partial class MainPage : ContentPage
         }
         catch (ProgramRuntimeException ex)
         {
-            ResultLabel.Text = ex.Message;
+            path = ex.Path;
+            ResultLabel.Text = $"Fout: {ex.Message}";
         }
+
+        if (grid is not null)
+        {
+            _drawable.Update(grid, path);
+            GridView.Invalidate();
+        }
+
+        var metrics = _metrics.Calculate(program);
+        MetricsLabel.Text = $"Commando's: {metrics.CommandCount}, " +
+                            $"maximale nesting: {metrics.MaxNestingLevel}, " +
+                            $"herhalingen: {metrics.RepeatCount}";
     }
 
     //the start cell (s) in the grid, or (0,0) when the grid has none
