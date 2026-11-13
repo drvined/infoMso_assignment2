@@ -1,6 +1,4 @@
-using ProgrammingLearningApp.Domain;
-
-namespace ProgrammingLearningApp.Execution;
+namespace ProgrammingLearningApp.Domain;
 
 //everything a command needs while a program runs: the character, the trace of
 //executed commands, the path (every cell the character has been on) and optionally the grid
