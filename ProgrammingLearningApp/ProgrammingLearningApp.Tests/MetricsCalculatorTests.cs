@@ -1,4 +1,4 @@
-﻿using ProgrammingLearningApp.Metrics;
+using ProgrammingLearningApp.Metrics;
 using Xunit;
 
 namespace ProgrammingLearningApp.Tests;
@@ -24,5 +24,11 @@ public class MetricsCalculatorTests
     public void Example3_MatchesTable()
     {
         Assert.Equal(new ProgramMetrics(11, 2, 2), Measure(TestPrograms.Example3));
+    }
+
+    [Fact]
+    public void RepeatUntil_CountsAsRepeatAndAddsANestingLevel()
+    {
+        Assert.Equal(new ProgramMetrics(2, 1, 1), Measure("Repeat until WallAhead\n    Move 1"));
     }
 }

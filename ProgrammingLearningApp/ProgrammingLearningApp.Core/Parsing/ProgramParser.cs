@@ -142,8 +142,20 @@ public sealed class ProgramParser
                 var body = ParseBlock(lines, ref index, line.Level + 1);
                 return new Repeat(times, body);
 
+            case "Repeat" when parts.Length == 3 && parts[1] == "until":
+                var condition = ParseCondition(line, parts[2]);
+
+                if (index >= lines.Count || lines[index].Level <= line.Level)
+                {
+                    throw Error(line,
+                        $"A repeat until needs at least one command below it, indented {IndentSize} more spaces.");
+                }
+
+                var untilBody = ParseBlock(lines, ref index, line.Level + 1);
+                return new RepeatUntil(condition, untilBody);
+
             case "Repeat":
-                throw Error(line, "Expected 'Repeat [x] times', for example 'Repeat 4 times'.");
+                throw Error(line, "Expected 'Repeat [x] times' or 'Repeat until [condition]'.");
 
             default:
                 throw Error(line, $"Unknown command '{parts[0]}'. Valid commands are Move, Turn and Repeat.");
@@ -160,6 +172,14 @@ public sealed class ProgramParser
 
         return value;
     }
+
+    //reads the name of a condition, for example WallAhead or GridEdge
+    private static Condition ParseCondition(SourceLine line, string text) => text switch
+    {
+        "WallAhead" => new WallAheadCondition(),
+        "GridEdge" => new GridEdgeCondition(),
+        _ => throw Error(line, $"Unknown condition '{text}'. Valid conditions are WallAhead and GridEdge."),
+    };
 
     private static FormatException Error(SourceLine line, string message) =>
         Error(line.Number, line.Content, message);

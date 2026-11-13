@@ -58,4 +58,16 @@ public class ExecutionStateTests
 
         Assert.Equal(new Position(0, -1), character.Position);
     }
+
+    [Fact]
+    public void StepForward_WhenStepLimitIsReached_ThrowsExecutionLimitException()
+    {
+        var character = new Character(0, 0, Direction.East);
+        var state = new ExecutionState(character, null, maxSteps: 2);
+
+        state.StepForward();
+        state.StepForward();
+
+        Assert.Throws<ExecutionLimitException>(() => state.StepForward());
+    }
 }
